@@ -1,0 +1,1161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="Concept demo by 21X Sports for Galway Bay Apparel: an AI sales agent in web chat and RCS.">
+<title>Galway Sales Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,wght@1,400;1,500&display=swap">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>
+/* Layout: co-branded pitch. A captured agent run is the hero: on the right, the Galway storefront with
+   the chat agent docked on a product page (it becomes a phone when the conversation moves to RCS);
+   on the left, the agent's live activity log and the Shopify cart/order it is working on.
+   Then how it works, the pilot, the economics and the partnership steps.
+   Brand: Galway leads (wet-slate ink, links green, mist neutrals); wide technical grotesque with an
+   italic serif accent word, the way Galway sets "Never Miss a Day"; 21X marks the platform layer in signal yellow. */
+:root{
+  --bg:#F3F5F3; --surface:#FFFFFF; --wash:#E9EEEB; --sand:#E9EEEB;
+  --ink:#0F1A16; --muted:#55645E; --line:#D6DDD9;
+  --green:#17694B; --greenfill:#1E7F5C; --amber:#935E00; --coral:#B2452F; --blue:#2E62B0; --navy:#0F1A16;
+  --x21:#B57C00; --panel:#0F1815; --panel-ink:#D5E3DC; --panel-muted:#86A096; --panel-line:#1E2E28;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --serif:"Newsreader","Iowan Old Style",Georgia,serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  /* the device screen is its own world and stays light */
+  --scr:#F4F6F5; --scr-ink:#121A17; --scr-muted:#64716C; --mine:#0F1A16;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A110F; --surface:#111B18; --wash:#111B18; --sand:#1B2622;
+  --ink:#E4EDE8; --muted:#93A39C; --line:#1F2D28;
+  --green:#5CC79B; --greenfill:#2FA57A; --amber:#E7A23B; --coral:#E8836F; --blue:#8FB4F0; --navy:#E4EDE8;
+  --x21:#F2B635; --panel:#060B0A; --panel-ink:#D5E3DC; --panel-muted:#7F998F; --panel-line:#182620; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A110F; --surface:#111B18; --wash:#111B18; --sand:#1B2622;
+  --ink:#E4EDE8; --muted:#93A39C; --line:#1F2D28;
+  --green:#5CC79B; --greenfill:#2FA57A; --amber:#E7A23B; --coral:#E8836F; --blue:#8FB4F0; --navy:#E4EDE8;
+  --x21:#F2B635; --panel:#060B0A; --panel-ink:#D5E3DC; --panel-muted:#7F998F; --panel-line:#182620; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.6; padding-inline:20px}
+.wrap{max-width:1180px; margin:0 auto}
+h1,h2,h3,h4{font-family:var(--display); font-weight:600; text-transform:uppercase; text-wrap:balance; margin:0; line-height:1; letter-spacing:.01em}
+p{margin:0}
+.eyebrow{font-weight:600; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--green)}
+:focus-visible{outline:3px solid var(--greenfill); outline-offset:2px}
+
+/* top bar */
+.top{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; padding-block:20px 6px}
+.lockup{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.x21{font:700 22px var(--display); letter-spacing:.04em; color:var(--ink); display:flex; align-items:baseline; gap:6px}
+.x21 b{color:var(--x21)}
+.x21 small{font:600 12px var(--body); letter-spacing:.2em; color:var(--muted)}
+.cross{font-family:var(--display); color:var(--muted); font-size:18px}
+.toa{display:flex; align-items:center; gap:8px; font:600 15px var(--display); letter-spacing:.16em; color:var(--ink)}
+.toa svg{width:26px; height:26px}
+.tag{font-family:var(--mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase; border:1px solid var(--line); border-radius:3px; padding:5px 11px; color:var(--muted)}
+
+/* hero */
+.hero{display:grid; grid-template-columns:minmax(0,1fr) 372px; grid-template-areas:"intro phone" "tabs phone" "ops phone"; grid-template-rows:auto auto 1fr; column-gap:48px; align-items:start; padding-block:28px 64px}
+.intro{grid-area:intro} .tabs{grid-area:tabs} .ops{grid-area:ops} .phone-col{grid-area:phone}
+.hero h1{font-size:clamp(50px,6vw,78px); font-weight:700; line-height:.9; margin-top:14px}
+.hero h1 em{font-style:normal; color:var(--green)}
+.lede{font-size:18px; color:var(--muted); max-width:36em; margin-top:20px}
+.lede b{color:var(--ink); font-weight:600}
+
+.tabs{display:flex; flex-wrap:wrap; gap:8px; margin-top:28px}
+.tab{font:600 15px var(--display); letter-spacing:.08em; text-transform:uppercase; color:var(--ink); background:var(--surface); border:1.5px solid var(--line); border-radius:3px; padding:9px 15px; cursor:pointer; display:flex; gap:9px; align-items:center}
+.tab:hover{border-color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.tab .n{font-family:var(--mono); font-size:11px; opacity:.7}
+.tab.live .dot{width:8px; height:8px; border-radius:50%; background:var(--coral); box-shadow:0 0 0 3px color-mix(in srgb,var(--coral) 25%,transparent)}
+.scene{margin-top:18px; display:grid; gap:6px; max-width:40em}
+.scene h3{font-size:24px; letter-spacing:.03em}
+.scene p{color:var(--muted)}
+
+/* ops column: agent activity + manifest */
+.ops{margin-top:22px; display:grid; gap:18px; min-width:0}
+.console{background:var(--panel); color:var(--panel-ink); border-radius:6px; overflow:hidden; min-width:0}
+.chead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--panel-line); font:600 13px var(--display); letter-spacing:.14em; text-transform:uppercase}
+.chead .state{font-family:var(--mono); font-size:11px; letter-spacing:.02em; text-transform:none; color:var(--panel-muted); display:flex; gap:7px; align-items:center}
+.chead .state i{width:7px; height:7px; border-radius:50%; background:#5FD08F; display:inline-block}
+.chead .state.idle i{background:var(--panel-muted)}
+.log{list-style:none; margin:0; padding:10px 0; height:300px; overflow-y:auto; font-family:var(--mono); font-size:12px; line-height:1.5; scroll-behavior:smooth}
+.log li{display:grid; grid-template-columns:52px minmax(0,1fr); gap:10px; padding:5px 14px; animation:rise .3s ease both}
+.log .k{font-size:10px; letter-spacing:.06em; text-transform:uppercase; border-radius:2px; padding:2px 0; text-align:center; align-self:start; font-weight:500}
+.k-evt{background:#27403A; color:#BFDAD0}
+.k-think{background:transparent; color:var(--panel-muted); border:1px solid var(--panel-line)}
+.k-tool{background:#0F5A40; color:#B9F0D8}
+.k-rule{background:#5C4210; color:#F8D58F}
+.k-write{background:#1E3F7A; color:#C3D6FF}
+.k-human{background:#6B2A20; color:#FFC8BC}
+.k-send{background:#24443A; color:#B6EBCF}
+.log .t{min-width:0; overflow-wrap:anywhere}
+.log .fn{color:#FFFFFF}
+.log .args{color:var(--panel-muted)}
+.log .res{display:block; color:#9FE3C1}
+.log .res.warn{color:#F8D58F}
+.log .res.pend{color:var(--panel-muted)}
+.log .thought{color:var(--panel-muted); font-style:italic}
+.log li.empty{display:block; color:var(--panel-muted)}
+
+.manifest{border:1px solid var(--line); border-radius:6px; background:var(--surface); overflow:hidden; min-width:0}
+.mhead{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px; border-bottom:1px solid var(--line); background:var(--wash)}
+.mhead h4{font-size:17px; letter-spacing:.1em}
+.mhead p{font-size:13px; color:var(--muted)}
+.status{font:600 12px var(--mono); text-transform:uppercase; letter-spacing:.04em; padding:4px 9px; border-radius:3px}
+.st-open{background:color-mix(in srgb,var(--amber) 18%,transparent); color:var(--amber)}
+.st-ready{background:color-mix(in srgb,var(--green) 18%,transparent); color:var(--green)}
+.st-air{background:var(--ink); color:var(--bg)}
+.mtable-wrap{overflow-x:auto}
+.mtable{width:100%; border-collapse:collapse; font-size:13.5px; min-width:460px}
+.mtable th,.mtable td{text-align:left; padding:9px 14px; border-bottom:1px solid var(--line); white-space:nowrap}
+.mtable th{font:500 10.5px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+.mtable td:first-child b{display:block; font-weight:600}
+.mtable td:first-child span{font-size:12px; color:var(--muted)}
+.mtable td{font-variant-numeric:tabular-nums}
+.cell{font-family:var(--mono); font-size:12px}
+.miss{color:var(--coral)}
+.okc{color:var(--green)}
+.warnc{color:var(--amber)}
+.na{color:var(--muted)}
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%{background:color-mix(in srgb,var(--greenfill) 28%,transparent)}100%{background:transparent}}
+.mfoot{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-top:1px solid var(--line)}
+.mfoot div{padding:10px 14px; font-size:12.5px; color:var(--muted); border-right:1px solid var(--line); min-width:0}
+.mfoot div:last-child{border-right:0}
+.mfoot b{display:block; font:600 18px var(--display); letter-spacing:.04em; color:var(--ink); font-variant-numeric:tabular-nums}
+.queue{padding:10px 14px 12px; border-top:1px solid var(--line); display:grid; gap:6px; font-size:13px}
+.queue h5{margin:0; font:500 10.5px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--muted)}
+.qi{display:grid; grid-template-columns:auto minmax(0,1fr); gap:8px; align-items:baseline; animation:rise .3s ease both}
+.qi .status{font-size:10.5px}
+.qnone{color:var(--muted); font-size:13px}
+
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* phone */
+.phone-col,.phone,.screen,.screen>*,.thead>div,.row{min-width:0}
+.phone-col{width:100%; display:grid; gap:12px; justify-items:center; position:sticky; top:calc(env(safe-area-inset-top,0px) + 16px)}
+.phone{width:100%; max-width:362px; background:#0A1218; border-radius:46px; padding:12px; box-shadow:0 30px 60px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08) inset}
+.screen{position:relative; background:var(--scr); color:var(--scr-ink); border-radius:36px; overflow:hidden; height:690px; display:flex; flex-direction:column; font-family:var(--body)}
+.sbar{display:flex; justify-content:space-between; padding:12px 22px 4px; font:600 12px var(--body)}
+.thead{display:flex; align-items:center; gap:10px; padding:8px 14px 10px; border-bottom:1px solid #E1E6E9; background:#fff}
+.avatar{width:42px; height:42px; border-radius:50%; background:#0F1A16; display:grid; place-items:center; flex:none}
+.avatar svg{width:28px; height:28px}
+.tname{font:600 15px var(--body); display:flex; align-items:center; gap:5px}
+.tsub{font-size:11.5px; color:var(--scr-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.verified{width:15px; height:15px; flex:none}
+.thread{flex:1; overflow-y:auto; padding:14px 12px 8px; display:flex; flex-direction:column; gap:8px; scroll-behavior:smooth}
+.row{display:flex; animation:rise .3s ease both}
+.row.me{justify-content:flex-end}
+.bub{max-width:84%; background:#fff; border-radius:18px 18px 18px 6px; padding:9px 13px; font-size:13.5px; line-height:1.45; box-shadow:0 1px 0 rgba(0,0,0,.04); white-space:pre-wrap; overflow-wrap:anywhere}
+.me .bub{background:var(--mine); color:#fff; border-radius:18px 18px 6px 18px}
+.typing{display:inline-flex; gap:4px; padding:12px 14px}
+.typing span{width:6px; height:6px; border-radius:50%; background:#A2AEB5; animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+.stamp{align-self:center; font-size:11px; color:var(--scr-muted); padding:4px 0}
+.read{align-self:flex-end; font-size:10.5px; color:var(--scr-muted); margin-top:-4px}
+
+/* RCS rich card: media + title + description + up to 4 buttons. Nothing else is native. */
+.card{width:86%; background:#fff; border-radius:18px; overflow:hidden; box-shadow:0 1px 0 rgba(0,0,0,.05), 0 0 0 1px #E6EBEE}
+.card .media{display:block; width:100%; height:auto}
+.cb{padding:11px 13px 12px; display:grid; gap:3px}
+.cb .cn{font:600 14px var(--body); line-height:1.3}
+.cb .cs{font-size:12.5px; color:var(--scr-muted); line-height:1.4; white-space:pre-line}
+.cbtns{display:grid}
+.cbtn{font:600 13.5px var(--body); color:#17694B; background:#fff; border:0; border-top:1px solid #E6EBEE; padding:11px 10px; cursor:default; text-align:center}
+.live-on .cbtn{cursor:pointer}
+.live-on .cbtn:hover{background:#EFF6F2}
+.cbtn[disabled]{color:#9AA6AC}
+.cbtn .ai{font-size:11px; margin-right:5px}
+/* web view panel (RCS "open URL in web view", tall mode) */
+.webview{position:absolute; inset:auto 0 0 0; height:74%; background:#fff; border-radius:22px 22px 0 0; box-shadow:0 -12px 40px rgba(0,0,0,.28); transform:translateY(105%); transition:transform .45s cubic-bezier(.2,.8,.2,1); display:flex; flex-direction:column; z-index:5; color:var(--scr-ink)}
+.webview.open{transform:none}
+.scrim{position:absolute; inset:0; background:rgba(10,18,24,.35); opacity:0; pointer-events:none; transition:opacity .3s; z-index:4}
+.scrim.open{opacity:1}
+.wv-grab{width:40px; height:4px; border-radius:2px; background:#CBD3D7; margin:8px auto 4px}
+.wv-bar{display:flex; justify-content:space-between; align-items:center; padding:4px 16px 10px; border-bottom:1px solid #E6EBEE; font-size:12px; color:var(--scr-muted)}
+.wv-bar b{color:var(--scr-ink); font-weight:600; font-size:13px; display:flex; gap:6px; align-items:center}
+.wv-bar svg{width:12px; height:12px}
+.wv-body{flex:1; overflow:auto; padding:14px 16px; display:grid; gap:10px; align-content:start}
+.wv-body h5{margin:0; font:700 20px var(--display); letter-spacing:.03em; text-transform:uppercase}
+.wv-body p{font-size:12.5px; color:var(--scr-muted)}
+.wv-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; border:1px solid #E1E6E9; border-radius:10px; padding:10px 12px; font-size:13px}
+.wv-row small{display:block; color:var(--scr-muted); font-size:11.5px}
+.wv-row .st{font:600 11.5px var(--mono); color:#B2452F}
+.wv-row.done{border-color:#A5D3BF; background:#F1F9F5}
+.wv-row.done .st{color:#17694B}
+.wv-submit{font:600 15px var(--display); letter-spacing:.08em; text-transform:uppercase; background:#0F1A16; color:#fff; border:0; border-radius:8px; padding:12px; margin-top:4px; cursor:pointer}
+.wv-submit[disabled]{opacity:.45; cursor:default}
+/* build notes: label what each element is in real RCS */
+.screen.notes [data-rcs]:not(.webview){position:relative} .screen.notes [data-rcs]{outline:1.5px dashed #C98A00; outline-offset:2px}
+.screen.notes .webview:not(.open)::after{display:none}
+.screen.notes .card::after,.screen.notes .webview::after{top:6px}
+.screen.notes [data-rcs]::after{content:attr(data-rcs); position:absolute; left:6px; top:-9px; font:500 9.5px var(--mono); letter-spacing:.02em; background:#C98A00; color:#fff; padding:2px 6px; border-radius:3px; white-space:nowrap; max-width:calc(100% - 12px); overflow:hidden; text-overflow:ellipsis; z-index:2}
+.screen.notes .row.me [data-rcs]::after{left:auto; right:6px}
+.legend{width:100%; max-width:362px; border:1px solid var(--line); border-radius:6px; padding:12px 14px; display:grid; gap:7px; font-size:13px; color:var(--muted); background:var(--surface)}
+.legend b{color:var(--ink); font-weight:600}
+.legend h5{margin:0; font:600 12px var(--display); letter-spacing:.14em; text-transform:uppercase; color:var(--x21)}
+.chiprow{display:flex; gap:6px; flex-wrap:wrap; padding:2px 0 2px; max-width:100%}
+.chip{font:600 12.5px var(--body); color:#17694B; background:#fff; border:1px solid #BFD9CC; border-radius:99px; padding:7px 12px; cursor:default}
+.chip .ai{font-size:11px; margin-right:4px}
+.chip.press,.cbtn.press{background:#D3EADF}
+.live-on .chip{cursor:pointer}
+.moments{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:6px}
+.moments li{font:500 11px var(--mono); letter-spacing:.02em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:4px 8px; transition:all .3s}
+.moments li.past{color:var(--ink); border-color:var(--ink)}
+.moments li.on{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.sic{display:flex; gap:5px; align-items:center}
+.sic svg{height:11px; width:auto}
+.composer{display:flex; gap:8px; align-items:center; padding:8px 12px 14px; border-top:1px solid #E1E6E9; background:var(--scr)}
+.cbox{flex:1; min-width:0; background:#fff; border:1px solid #E1E6E9; border-radius:99px; padding:9px 14px; font:13px var(--body); color:var(--scr-ink); min-height:38px; display:flex; align-items:center}
+.cbox.ph{color:var(--scr-muted)}
+.cbox input{all:unset; width:100%; font:13px var(--body); color:var(--scr-ink)}
+.cbox input::placeholder{color:var(--scr-muted)}
+.caret{display:inline-block; width:1px; height:15px; background:#17694B; margin-left:1px; animation:blink 1s infinite}
+.send{width:36px; height:36px; border-radius:50%; border:0; background:#0F1A16; color:#fff; display:grid; place-items:center; flex:none; cursor:pointer}
+.send[disabled]{opacity:.4; cursor:default}
+.send svg{width:16px; height:16px}
+.phone-ctl{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center}
+.btn{font:600 14px var(--display); letter-spacing:.08em; text-transform:uppercase; background:transparent; color:var(--ink); border:1.5px solid var(--line); border-radius:3px; padding:7px 16px; cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.hint{font-size:13px; color:var(--muted); text-align:center; max-width:30em}
+.powered{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.powered b{color:var(--x21)}
+.sugg{display:flex; gap:6px; flex-wrap:wrap; justify-content:center}
+.sugg button{font:500 12.5px var(--body); color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 11px; cursor:pointer}
+.sugg button:hover{border-color:var(--ink)}
+
+/* sections */
+section.band{padding-block:72px; border-top:1px solid var(--line)}
+.shead{display:grid; gap:12px; max-width:46em; margin-bottom:34px}
+.shead h2{font-size:clamp(36px,4.8vw,58px)}
+.shead p{color:var(--muted); font-size:17px}
+
+.parts{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px}
+.part{display:grid; gap:8px; align-content:start; border-top:3px solid var(--c); padding-top:14px}
+.part small{font:500 11px var(--mono); text-transform:uppercase; letter-spacing:.05em; color:var(--c)}
+.part h3{font-size:24px}
+.part p{color:var(--muted); font-size:15px}
+.note90{margin-top:26px; font-size:14px; color:var(--muted); max-width:52em}
+
+.pilot{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:36px}
+.wf{list-style:none; margin:0; padding:0; display:grid; gap:0; counter-reset:wf}
+.wf li{display:grid; grid-template-columns:44px minmax(0,1fr); gap:12px; padding:14px 0; border-bottom:1px solid var(--line); counter-increment:wf}
+.wf li::before{content:counter(wf,decimal-leading-zero); font:600 22px var(--display); color:var(--green)}
+.wf b{display:block; font-weight:600}
+.wf span{color:var(--muted); font-size:15px}
+.measure h3{font-size:22px; margin-bottom:12px}
+.measure table{width:100%; border-collapse:collapse; font-size:14.5px}
+.measure th,.measure td{text-align:left; padding:10px 0; border-bottom:1px solid var(--line); vertical-align:top}
+.measure th{font:500 11px var(--mono); text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+.measure td:first-child{font:600 18px var(--display); color:var(--green); width:34px}
+.ask{margin-top:22px; background:var(--wash); border-radius:6px; padding:16px 18px; font-size:15px}
+.ask b{display:block; font:600 18px var(--display); letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px}
+
+.calc{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:36px; align-items:start}
+.sliders{display:grid; gap:22px}
+.sl{display:grid; gap:6px}
+.sl label{display:flex; justify-content:space-between; gap:10px; font-weight:600}
+.sl label output{font-family:var(--mono); font-weight:500; color:var(--green)}
+.sl input{width:100%; accent-color:var(--greenfill)}
+.res{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+.res div{border-top:2px solid var(--ink); padding-top:12px; display:grid; gap:4px}
+.res b{font:700 clamp(36px,4.6vw,56px) var(--display); line-height:1; font-variant-numeric:tabular-nums}
+.res div:nth-child(2) b{color:var(--green)}
+.res span{color:var(--muted); font-size:14px}
+.fine-calc{margin-top:18px; font-size:13.5px; color:var(--muted)}
+
+.steps{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0}
+.stp{padding-right:18px; display:grid; gap:10px; align-content:start}
+.stp .bar{height:4px; margin-right:-18px; background:var(--line)}
+.stp:nth-child(-n+2) .bar{background:var(--green)}
+.stp:last-child .bar{margin-right:0}
+.stp small{font:500 11px var(--mono); text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+.stp:nth-child(-n+2) small{color:var(--green)}
+.stp h3{font-size:21px}
+.stp p{font-size:14.5px; color:var(--muted)}
+
+.close{padding-block:80px 48px; border-top:1px solid var(--line); display:grid; gap:22px}
+.close h2{font-size:clamp(42px,6vw,84px); font-weight:700; line-height:.95; max-width:13em}
+.close h2 em{font-style:normal; color:var(--green)}
+.close p.q{font-size:18px; color:var(--muted); max-width:40em}
+.sig{display:flex; gap:22px; flex-wrap:wrap; align-items:center; color:var(--muted); font-size:15px}
+.sig b{color:var(--ink)}
+.fine{font-size:12px; color:var(--muted); max-width:64em; padding-block:0 40px}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:minmax(0,1fr); grid-template-areas:"intro" "tabs" "phone" "ops"; grid-template-rows:none; padding-block:12px 40px}
+  .tabs{flex-wrap:nowrap; overflow-x:auto; margin-inline:-20px; padding:2px 20px 6px; scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none; min-height:44px}
+  .phone-col{position:static; margin-top:18px}
+  .parts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pilot,.calc{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr); gap:22px}
+  .stp{padding:0} .stp .bar{margin-right:0}
+}
+@media (max-width:600px){
+  body{padding-inline:16px; font-size:15px}
+  .tabs{margin-inline:-16px; padding-inline:16px}
+  .hero h1{font-size:clamp(46px,14vw,62px)}
+  .lede{font-size:16px}
+  .phone{max-width:none; border-radius:34px; padding:7px}
+  .screen{border-radius:28px; height:min(660px, calc(100svh - 110px)); min-height:500px}
+  .bub{max-width:88%; font-size:14px}
+  .card,.ok{width:94%}
+  .parts,.res{grid-template-columns:minmax(0,1fr)}
+  .mfoot{grid-template-columns:minmax(0,1fr)}
+  .mfoot div{border-right:0; border-bottom:1px solid var(--line)}
+  .log{height:260px}
+  section.band{padding-block:48px}
+  .btn{min-height:42px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; scroll-behavior:auto!important} }
+
+/* ---------- Galway type overrides ---------- */
+h1,h2,h3,h4{font-family:var(--display); font-stretch:114%; font-weight:650; text-transform:none; letter-spacing:-.015em; line-height:1.06}
+h1 em,h2 em{font-family:var(--serif); font-style:italic; font-weight:400; font-stretch:100%; letter-spacing:-.01em; color:var(--green)}
+.hero h1{font-size:clamp(42px,5.2vw,70px); font-weight:700; line-height:.98; margin-top:14px}
+.hero h1 em{font-size:1.08em}
+.shead h2{font-size:clamp(28px,3.6vw,44px)}
+.close h2{font-size:clamp(36px,5vw,66px); font-weight:700; line-height:1.02}
+.close h2 em{font-size:1.06em}
+.scene h3{font-size:21px} .part h3{font-size:19px} .stp h3{font-size:17px} .measure h3{font-size:18px}
+.mhead h4{font-size:15px; letter-spacing:0}
+.tab,.btn,.chead,.wv-submit{font-family:var(--display); font-stretch:100%}
+.tab{font-size:13px} .btn{font-size:12.5px} .chead{font-size:12px}
+.wv-body h5{text-transform:none; font:650 18px var(--display); letter-spacing:-.01em}
+.wv-submit{font-size:13.5px}
+.gb{font:700 17px var(--display); letter-spacing:.24em; color:var(--ink)}
+.gb small{font:500 11px var(--body); letter-spacing:.08em; color:var(--muted); margin-left:8px; text-transform:uppercase}
+.x21{font-size:20px}
+.k-write{background:#1E3F7A; color:#C3D6FF}
+.part.p-blue{--c:var(--blue)}
+.gone{text-decoration:line-through; color:var(--muted)}
+.mtable td:first-child b.gone{font-weight:500}
+
+/* ---------- the device: storefront window or phone ---------- */
+.device{width:100%; max-width:372px; transition:opacity .28s ease}
+.device.swap{opacity:0}
+.device.rcs{background:#0A1218; border-radius:46px; padding:12px; box-shadow:0 30px 60px -30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08) inset}
+.device.rcs .screen{border-radius:36px}
+.device.web{border-radius:14px; border:1px solid var(--line); box-shadow:0 30px 60px -34px rgba(0,0,0,.5); overflow:hidden; background:#fff}
+.device.web .screen{border-radius:0}
+.device.web .rchrome,.device.rcs .wchrome{display:none}
+.device,.wchrome,.rchrome,.pdp>div{min-width:0}
+.screen{height:716px}
+.bbar{display:flex; gap:10px; align-items:center; padding:9px 12px; background:#E4E9E6}
+.dots{display:flex; gap:5px; flex:none} .dots i{width:9px; height:9px; border-radius:50%; background:#BEC8C3}
+.url{flex:1; min-width:0; background:#fff; border-radius:99px; padding:4px 12px; font:500 11px var(--mono); color:#64716C; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.promo{background:#0F1A16; color:#E4EDE8; font:500 10.5px var(--body); text-align:center; padding:4px 8px; letter-spacing:.02em}
+.store{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 14px; background:#fff; border-bottom:1px solid #E3E8E5}
+.wm{font:700 15px var(--display); letter-spacing:.26em; color:#0F1A16}
+.store .nav{font:500 11px var(--body); color:#64716C; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
+.cartic{position:relative; display:grid; place-items:center; width:26px; height:26px; color:#0F1A16; flex:none}
+.cartic svg{width:18px; height:18px}
+.cartic b{position:absolute; top:-3px; right:-5px; min-width:15px; height:15px; border-radius:99px; background:#17694B; color:#fff; font:600 9.5px var(--body); display:grid; place-items:center; padding:0 3px}
+.cartic b[data-n="0"]{display:none}
+.cartic.bump{animation:bump .5s ease}
+@keyframes bump{40%{transform:scale(1.35)}}
+.pdp{display:grid; grid-template-columns:62px minmax(0,1fr); gap:12px; padding:9px 14px 10px; background:#fff; align-items:center}
+.pdp svg{width:62px; height:62px; border-radius:6px; display:block}
+.pdp .pn{font:600 13.5px var(--body); color:#121A17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.pdp .pp{font:500 11.5px var(--mono); color:#64716C}
+.sizes{display:flex; gap:4px; margin-top:5px; flex-wrap:wrap}
+.sizes span{font:500 10px var(--mono); border:1px solid #D6DDD9; border-radius:3px; padding:2px 5px; color:#64716C; transition:all .2s}
+.sizes span.on{background:#0F1A16; color:#fff; border-color:#0F1A16}
+.chat-h{display:flex; align-items:center; gap:10px; padding:9px 14px; background:#0F1A16; color:#fff; border-radius:14px 14px 0 0; box-shadow:0 -10px 22px -10px rgba(0,0,0,.4); position:relative}
+.chat-h .av{width:30px; height:30px; border-radius:50%; background:#1E7F5C; display:grid; place-items:center; font:700 13px var(--display); flex:none}
+.chat-h b{font:600 13.5px var(--body); display:block; line-height:1.25}
+.chat-h small{font-size:11px; color:#A9C2B7; display:flex; gap:5px; align-items:center}
+.chat-h small i{width:6px; height:6px; border-radius:50%; background:#5FD08F}
+.device.web .bub{border-radius:14px 14px 14px 4px}
+.device.web .me .bub{border-radius:14px 14px 4px 14px; background:#17694B}
+.device.web .card{border-radius:12px}
+.avatar{font:700 17px var(--display); color:#fff}
+.legend,.hint{max-width:372px}
+.surface-tag{font:500 11px var(--mono); letter-spacing:.03em; text-transform:uppercase; color:var(--muted); display:flex; gap:8px; align-items:center}
+.surface-tag b{color:var(--ink); font-weight:500}
+.surface-tag i{width:7px; height:7px; border-radius:50%; background:var(--greenfill)}
+.cred{display:flex; flex-wrap:wrap; gap:8px 26px; color:var(--muted); font-size:14.5px; max-width:52em}
+.cred b{color:var(--ink); font-weight:600}
+.res{grid-template-columns:repeat(3,minmax(0,1fr))}
+.res b{font:700 clamp(30px,3.8vw,46px) var(--display); line-height:1}
+
+@media (max-width:600px){
+  .device{max-width:none}
+  .device.rcs{border-radius:34px; padding:7px}
+  .device.rcs .screen{border-radius:28px}
+  .screen{height:min(700px, calc(100svh - 90px)); min-height:560px}
+  .legend,.hint{max-width:none}
+  .hero h1{font-size:clamp(38px,11.5vw,54px)}
+  .res{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="lockup">
+      <span class="gb">GALWAY<small>Bay Apparel</small></span>
+      <span class="cross" aria-hidden="true">×</span>
+      <span class="x21"><b>21X</b>Sports</span>
+    </div>
+    <span class="tag">Concept demo · prepared Oct 2026</span>
+  </header>
+
+  <div class="hero">
+    <div class="intro">
+      <p class="eyebrow">AI sales agent for galwaybaygolf.com</p>
+      <h1>Never miss<br>a <em>sale.</em></h1>
+      <p class="lede">Watch a real agent run. A shopper hesitates on a product page and asks in their own words. The agent reads the <b>Galway catalog and size guide</b>, checks <b>stock and policy</b>, builds the cart, and follows up by <b>RCS text</b> when the tab closes. When someone asks for a return, it finds out why and offers the <b>exchange</b> first. Anything it can't answer goes to your team.</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Agent runs" id="tabs"></div>
+
+    <div class="ops">
+      <div class="scene" id="scene"></div>
+      <div class="console" aria-label="Agent activity">
+        <div class="chead"><span>Agent activity</span><span class="state" id="agentState"><i></i>running</span></div>
+        <ol class="log" id="log" aria-live="polite"></ol>
+      </div>
+      <div class="manifest" aria-label="Shopify cart and order">
+        <div class="mhead">
+          <div><h4 id="oTitle">Shopify · Cart</h4><p id="oSub"></p></div>
+          <span class="status st-open" id="mstatus">Browsing</span>
+        </div>
+        <div class="mtable-wrap"><table class="mtable"><thead><tr><th>Item</th><th>Variant</th><th>Price</th><th>Status</th></tr></thead><tbody id="mbody"></tbody></table></div>
+        <div class="mfoot">
+          <div><b id="mval">$0</b><span id="mvalL">Cart value</span></div>
+          <div><b id="mpts">—</b>Galway Rewards points</div>
+          <div><b id="mtouch">0</b>Handed to the team</div>
+        </div>
+        <div class="queue"><h5>Team inbox</h5><div id="mqueue"><span class="qnone">Nothing needs a person yet.</span></div></div>
+      </div>
+    </div>
+
+    <div class="phone-col">
+      <span class="surface-tag" id="surfaceTag"><i></i><b>Web chat</b> on galwaybaygolf.com</span>
+      <div class="device web" id="device" aria-label="The Galway storefront with the chat agent, or a phone showing an RCS conversation">
+        <div class="screen" id="screen">
+          <div class="wchrome">
+            <div class="bbar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url" id="url">galwaybaygolf.com</span></div>
+            <div class="promo">Free US shipping over $175 · Hassle-free returns</div>
+            <div class="store"><span class="wm">GALWAY</span><span class="nav">Men's · Women's · Sale</span>
+              <span class="cartic" id="cartic" aria-label="Cart"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h12l-1 10H5z"/><path d="M7 7V5.5a3 3 0 0 1 6 0V7"/></svg><b id="cartN" data-n="0">0</b></span></div>
+            <div class="pdp" id="pdp"></div>
+            <div class="chat-h"><span class="av">G</span><div><b>Galway Assistant</b><small><i></i>AI assistant · replies in seconds</small></div></div>
+          </div>
+          <div class="rchrome">
+            <div class="sbar"><span>9:41</span><span class="sic" aria-hidden="true"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5" width="3" height="7" rx="1" fill="currentColor"/><rect x="10" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg></span></div>
+            <div class="thead">
+              <div class="avatar">G</div>
+              <div>
+                <div class="tname">Galway Bay Apparel
+                  <svg class="verified" viewBox="0 0 16 16" aria-label="Verified sender"><path fill="#1E7F5C" d="M8 0l2 1.6 2.5-.2.8 2.4 2.1 1.4-.8 2.4.8 2.4-2.1 1.4-.8 2.4-2.5-.2L8 16l-2-1.6-2.5.2-.8-2.4L.6 10.8l.8-2.4-.8-2.4 2.1-1.4.8-2.4 2.5.2z"/><path d="M4.8 8.2l2.1 2.1 4.3-4.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                </div>
+                <div class="tsub">Verified business · RCS</div>
+              </div>
+            </div>
+          </div>
+          <div class="thread" id="thread"></div>
+          <div class="scrim" id="scrim"></div>
+          <div class="webview" id="webview" data-rcs="Checkout sheet · Shopify checkout opened from the message" aria-hidden="true"></div>
+          <form class="composer" id="composer" autocomplete="off">
+            <div class="cbox ph" id="cbox">Ask anything</div>
+            <button class="send" id="sendBtn" type="submit" disabled aria-label="Send"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1.8l13 6.2-13 6.2 1.6-6.2z"/></svg></button>
+          </form>
+        </div>
+      </div>
+      <div class="phone-ctl" id="ctl">
+        <button class="btn" id="pause" type="button">Pause</button>
+        <button class="btn" id="speed" type="button">Speed 1×</button>
+        <button class="btn" id="replay" type="button">Replay</button>
+        <button class="btn" id="notesBtn" type="button" aria-pressed="false">Show build notes</button>
+      </div>
+      <div class="sugg" id="sugg" hidden></div>
+      <p class="hint" id="hint"></p>
+      <div class="legend" id="legend" hidden>
+        <h5>How each piece is built</h5>
+        <span><b>Web chat</b>: a widget on the Shopify storefront. It knows which product page the shopper is on and what is in the cart.</span>
+        <span><b>Product cards</b>: built from live Shopify product data. On the site they can hold any layout; in RCS a card is one image, a title, a description and up to 4 buttons.</span>
+        <span><b>Buttons</b>: add to cart and checkout on the site; suggested replies and open-link actions in RCS.</span>
+        <span><b>RCS</b>: sent from a verified Galway sender, only to shoppers who opted in.</span>
+        <span><b>No RCS?</b> The same conversation goes out as SMS, with links in place of cards.</span>
+      </div>
+      <span class="powered">Sales agent powered by <b>21X</b>, formerly Structurely</span>
+    </div>
+  </div>
+
+  <section class="band">
+    <div class="shead">
+      <p class="eyebrow">How it works</p>
+      <h2>More than a chat window. An agent that can <em>act.</em></h2>
+      <p>Answering a sizing question is the easy part. The sale closes when the right size lands in the cart, and the exchange happens when the label is already in the customer's hand. The agent pairs conversation with Galway's own content and store systems, and your team keeps control of anything unusual.</p>
+    </div>
+    <div class="parts">
+      <div class="part" style="--c:var(--amber)"><small>Store knowledge</small><h3>Galway's own answers</h3><p>The catalog, the size and fit guide, shipping, the 30-day return window, one free exchange per order and Galway Rewards. It quotes what Galway has published and never invents a price or a discount.</p></div>
+      <div class="part" style="--c:var(--green)"><small>Conversational AI</small><h3>Sells like your best rep</h3><p>Understands "42 chest, but I want a sweater under it", asks the one question that settles the size, and takes no for an answer when a shopper passes on an add-on.</p></div>
+      <div class="part p-blue"><small>Store integration</small><h3>Reads and writes back</h3><p>Shopify for products, stock, carts and orders. The returns portal for exchanges and labels. Rewards for points. It works where each system allows it.</p></div>
+      <div class="part" style="--c:var(--coral)"><small>Team inbox</small><h3>Handoffs with context</h3><p>Custom orders, damaged items and anything outside policy go to a person, with the conversation and the order attached. The shopper is told who has it.</p></div>
+    </div>
+    <p class="note90">Galway's site already has an Ask AI assistant. This pilot is about what happens after the answer: the cart, the follow-up text and the exchange. Which systems the agent can write to is confirmed in discovery, not assumed here.</p>
+  </section>
+
+  <section class="band">
+    <div class="shead">
+      <p class="eyebrow">Controlled pilot</p>
+      <h2>Start with the four moments that decide the sale.</h2>
+    </div>
+    <div class="pilot">
+      <ol class="wf">
+        <li><div><b>Size and fit on the product page</b><span>The shopper who toggles between L and XL gets an answer from the size guide before they leave.</span></div></li>
+        <li><div><b>Cart recovery, in chat and by text</b><span>An open cart gets one opted-in reminder with the items, the price and a checkout link.</span></div></li>
+        <li><div><b>Building the kit</b><span>The right jacket for the conditions, then the pant and layer that go with it, offered once.</span></div></li>
+        <li><div><b>Exchange before refund</b><span>Ask why, offer the size that fixes it, send the label. The refund is always still available.</span></div></li>
+        <li><div><b>Order status and policy questions</b><span>Where is my order, shipping times, care instructions. Answered at any hour.</span></div></li>
+      </ol>
+      <div class="measure">
+        <h3>What we measure</h3>
+        <table>
+          <thead><tr><th></th><th>Outcome</th><th>Measured by</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>More carts closed</td><td>Conversion rate with and without a chat, cart recovery rate</td></tr>
+            <tr><td>2</td><td>Bigger orders</td><td>Average order value, items per order, add-on acceptance</td></tr>
+            <tr><td>3</td><td>Fewer refunds</td><td>Share of return requests that end as an exchange, revenue kept</td></tr>
+            <tr><td>4</td><td>Time back for the team</td><td>Questions resolved without a ticket, time to first reply</td></tr>
+          </tbody>
+        </table>
+        <div class="ask"><b>The numbers we need from Galway</b>Monthly orders, average order value, return rate, the share of returns that become exchanges today, the top return reasons, and support tickets per month. With those we can build a model we both trust.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="shead">
+      <p class="eyebrow">The economic story to prove</p>
+      <h2>Two levers: bigger orders, fewer refunds.</h2>
+      <p>Move the inputs. These are placeholders, not Galway's figures. Your real numbers replace them in discovery.</p>
+    </div>
+    <div class="calc">
+      <div class="sliders">
+        <div class="sl"><label for="sOrd">Online orders per month <output id="oOrd">800</output></label><input type="range" id="sOrd" min="100" max="5000" step="50" value="800"></div>
+        <div class="sl"><label for="sAov">Average order value <output id="oAov">$320</output></label><input type="range" id="sAov" min="100" max="700" step="10" value="320"></div>
+        <div class="sl"><label for="sLift">Order value lift from the agent <output id="oLift">5%</output></label><input type="range" id="sLift" min="0" max="20" step="1" value="5"></div>
+        <div class="sl"><label for="sRet">Orders with a return request <output id="oRet">15%</output></label><input type="range" id="sRet" min="2" max="40" step="1" value="15"></div>
+        <div class="sl"><label for="sExc">Refunds turned into exchanges <output id="oExc">20%</output></label><input type="range" id="sExc" min="0" max="60" step="5" value="20"></div>
+      </div>
+      <div>
+        <div class="res">
+          <div><b id="rLift">$12,800</b><span>from larger orders, per month</span></div>
+          <div><b id="rKept">$7,680</b><span>kept through exchanges, per month</span></div>
+          <div><b id="rYear">$245,760</b><span>both levers, per year</span></div>
+        </div>
+        <p class="fine-calc">An illustration, not a projection. It leaves out recovered carts and assumes an exchange keeps the full value of an order. The pilot exists to measure the real figures.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="shead">
+      <p class="eyebrow">Partnership</p>
+      <h2>Build it with Galway as our golf retail pilot partner.</h2>
+    </div>
+    <div class="steps">
+      <div class="stp"><div class="bar"></div><small>Step 1</small><h3>Map the store</h3><p>Catalog, size guide, policies, return reasons and the questions your team answers most.</p></div>
+      <div class="stp"><div class="bar"></div><small>Step 2 · this page</small><h3>Galway experience</h3><p>A Galway-branded agent on the site and in RCS, tuned to how Galway talks about its gear.</p></div>
+      <div class="stp"><div class="bar"></div><small>Step 3</small><h3>Pilot on the site</h3><p>Web chat on selected product pages plus the exchange flow, measured against today.</p></div>
+      <div class="stp"><div class="bar"></div><small>Step 4</small><h3>Add texting</h3><p>Cart recovery, order updates and exchanges by text: SMS first, RCS once the sender is approved.</p></div>
+      <div class="stp"><div class="bar"></div><small>Step 5</small><h3>Expand</h3><p>After-hours phone support, win-back of past buyers and new arrivals for Rewards members.</p></div>
+    </div>
+  </section>
+
+  <section class="close">
+    <p class="eyebrow">Next step</p>
+    <h2>Rain or shine, every shopper gets <em>an answer.</em></h2>
+    <p class="q">We start with the moments costing Galway the most sales, prove the lift, and expand from there.</p>
+    <div class="sig"><span class="x21"><b>21X</b>Sports</span><span><b>Adam Squire</b>, President</span><span>Formerly Structurely</span></div>
+  </section>
+  <p class="fine">Concept demo built by 21X Sports for Galway Bay Apparel. It is not a live Galway channel and the storefront shown is an illustration, not Galway's site. The shoppers, order numbers, phone number, stock levels, dates and conversations are fictional. Product names, prices, fabric and fit details, shipping times, the return and exchange terms and Galway Rewards values are taken from galwaybaygolf.com as of October 11, 2026 and should be confirmed by Galway; sale prices change. Shopify, a returns portal and a rewards program are shown as the systems the agent would connect to, and what it can write to each is settled in discovery. Phone screens follow RCS for Business capabilities as of October 2026; feature support varies by device and carrier, with SMS fallback. Names and marks belong to their owners.</p>
+</div>
+
+<script>
+/* ===================== BRAND (swap these for another client) =====================
+   Name and sender: BRAND below + the top lockup + .wm/.tname. Colors and fonts: the :root tokens.
+   Catalog and policy: CATALOG and POLICY. Story: RUNS (recorded) and liveRules (live). */
+const BRAND={name:'Galway Bay Apparel', site:'galwaybaygolf.com'};
+
+/* ===================== catalog: names, prices and specs from galwaybaygolf.com, Oct 11 2026 ===================== */
+const JS=['XS','S','M','L','XL','2XL','3XL'], PS=['32x32','34x30','34x32','34x34','36x32'];
+const CATALOG={
+  clifden:{name:'Clifden Golf Rain Jacket',price:549,kind:'jacket',cat:'rain jacket',k:'3L EYRE PRO™',badges:['30K / 30K','SEAM-SEALED','4-WAY STRETCH'],url:'products/clifden-golf-rain-jacket',sizes:JS,
+    colors:'Black and Navy $549; Silver Cloud $599',facts:'The flagship. 3-layer Eyre Pro, 30K waterproof / 30K breathable, fully seam-sealed, 82% nylon 18% spandex, 4-way stretch, silent fabric. Storm-Seal neck cinch, adjustable velcro cuffs, waterproof zipper, PostureLock side cinch (hidden adjusters in the hand pockets stop the jacket blousing at address). Best for sustained rain and wind.'},
+  corrib:{name:'Corrib Golf Rain Jacket',price:299,was:449,kind:'jacket',cat:'rain jacket',k:'LAST RUN',badges:['30K / 30K','SEAM-SEALED'],url:'products/mens-corrib-golf-rain-jacket',sizes:JS,
+    colors:'ask',facts:'Last run, $299 (was $449). 3-layer, 30K/30K, 4-way stretch, seam-sealed, waterproof zipper, tailored athletic fit. Best value.'},
+  cleggan:{name:'Cleggan Rain Pull Over',price:249,kind:'pullover',cat:'rain jacket',k:'EYRE LT™',badges:['20K / 20K','PACKABLE'],url:'products/cleggan-rain-pull-over',sizes:JS.slice(0,6),
+    colors:'White, Black, Navy',facts:'Packable pullover. 20K waterproof / 20K breathable, featherlight, mechanical stretch, seam-sealed, no waterproof zipper. Best for travel rounds and low-bulk coverage.'},
+  erris:{name:'Erris Short Sleeve Rain Jacket',price:251,was:279,kind:'pullover',cat:'rain jacket',k:'EYRE LT™',badges:['20K / 20K','SHORT SLEEVE'],url:'products/erris-short-sleeve-rain-jacket',sizes:JS.slice(0,6),
+    colors:'White, Black, Navy',facts:'Short sleeve, 20K/20K, featherlight, strategic vent system. Best for warm conditions.'},
+  claddagh:{name:'Claddagh Chino Rain Pant',price:299,kind:'pants',cat:'pants',k:'3L EYRE PRO™',badges:['30K / 30K','SEAM-SEALED','CLASSIC FIT'],url:'products/claddagh-chino-rain-pant-new',sizes:PS,
+    colors:'Black, Navy Blue, Insignia Blue, Gray, Silver Cloud (limited)',facts:'Waist 28 to 42 with 28, 30, 32 or 34 inseams. 3-layer Eyre Pro, 30K/30K, fully seam-sealed, windproof, 4-way stretch. Classic fit with room for a base layer. Designed to be worn as the only golf pant, so no pull-on rain pant is needed. Most shoppers buy their usual size.'},
+  spiddal:{name:'Spiddal Five Pocket Pant',price:229,kind:'pants',cat:'pants',k:'EYRE FLEX™',badges:['4-WAY STRETCH','TAPERED'],url:'products/spiddal-five-pocket-pant',sizes:PS,
+    colors:'Navy Blue, Black',facts:'Eyre Flex stretch weather protection. Tailored modern fit with a tapered leg, five-pocket design.'},
+  ayle:{name:'Ayle Pull-Up Rain Pant',price:329,kind:'pants',cat:'pants',k:'OVER-PANT',badges:['PULL-UP'],url:'products/ayle-rain-pant',sizes:['S','M','L','XL','2XL'],
+    colors:'Black, Navy, Gray',facts:'Over-pant: pulls on over shorts or trousers, elastic waist, long lower-leg zippers to go on over golf shoes.'},
+  kylemore:{name:'Kylemore Hybrid Pullover',price:229,kind:'mid',cat:'midlayer',k:'MIDLAYER',badges:['INSULATED'],url:'products/kylemore-hybrid-pullover',sizes:JS.slice(0,6),
+    colors:'Black, Navy',facts:'Insulated midlayer, worn over a polo and under a Galway rain shell.'},
+  barna:{name:'Barna Softshell Rain Quarter Zip',price:199,kind:'mid',cat:'midlayer',k:'MIDLAYER',badges:['SOFTSHELL'],url:'products/barna-softshell-rain-quarter-zip',sizes:JS.slice(0,6),
+    colors:'Black',facts:'Non-insulated softshell quarter zip midlayer.'},
+  moycullen:{name:'Moycullen Hybrid Vest',price:199,kind:'mid',cat:'midlayer',k:'MIDLAYER',badges:['INSULATED'],url:'products/moycullen-hybrid-vest',sizes:JS.slice(0,6),
+    colors:'Black, Navy',facts:'Insulated hybrid vest for core warmth under a shell.'},
+  nimmo:{name:'Nimmo Rain Vest',price:299,kind:'mid',cat:'vest',k:'EYRE PRO™',badges:['RAIN VEST'],url:'products/nimmo-rain-vest',sizes:JS.slice(0,6),
+    colors:'Black, Navy',facts:'Eyre Pro rain vest: maximum rain protection for the core with free arms.'}
+};
+
+/* ===================== generated images =====================
+   In RCS a card is one image + title + text + buttons, so anything richer is drawn into the image
+   for each shopper. These SVGs stand in for those images (and for product photos on the site). */
+const F='font-family="Archivo, Helvetica Neue, Arial, sans-serif"', FB='font-family="IBM Plex Sans, Helvetica Neue, Arial, sans-serif"';
+const COL={navy:'#1F2E4A',black:'#1B1D1F',gray:'#737C84',white:'#DADFDD'}, HL='rgba(255,255,255,.4)';
+function garment(kind,color,x,y,s,len=104){
+  const c=COL[color]||color;
+  const shell=`<path d="M30 9 L43 2 Q50 9 57 2 L70 9 L93 24 L85 62 L73 55 V104 H27 V55 L15 62 L7 24Z" fill="${c}"/><path d="M43 2 Q50 13 57 2" fill="none" stroke="${HL}" stroke-width="1.6"/>`;
+  const g={
+    jacket:shell+`<path d="M50 8 V104" stroke="${HL}" stroke-width="1.6"/><path d="M33 76 h9 M58 76 h9" stroke="${HL}" stroke-width="1.6" stroke-linecap="round"/>`,
+    pullover:shell+`<path d="M50 8 V48" stroke="${HL}" stroke-width="1.6"/><path d="M36 82 h28" stroke="${HL}" stroke-width="1.6" stroke-linecap="round"/>`,
+    mid:shell+`<path d="M50 8 V40" stroke="${HL}" stroke-width="1.6"/><path d="M27 97 H73" stroke="${HL}" stroke-width="1.4"/>`,
+    pants:`<path d="M27 2 H73 L80 ${len} H57 L50 36 L43 ${len} H20Z" fill="${c}"/><path d="M27.5 11 H72.5" stroke="${HL}" stroke-width="1.6"/><path d="M50 11 V30" stroke="${HL}" stroke-width="1.4"/>`
+  };
+  return `<g transform="translate(${x},${y}) scale(${s})">${g[kind]||g.jacket}</g>`;
+}
+function mist(w,h){
+  const rain=[[22,12],[64,34],[104,8],[150,26],[196,10],[236,36],[272,16],[42,58],[128,62],[214,60],[258,74]].filter(([x,y])=>x<w&&y<h-40)
+    .map(([x,y])=>`<path d="M${x} ${y} l-5 15" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>`).join('');
+  return `<rect width="${w}" height="${h}" fill="#D3DDD8"/><rect width="${w}" height="${h*.45}" fill="#C6D2CC"/>${rain}
+    <path d="M0 ${h-34} Q${w*.25} ${h-54} ${w*.5} ${h-38} T${w} ${h-46} V${h} H0Z" fill="#9FB5A8"/><path d="M0 ${h-16} Q${w*.3} ${h-30} ${w*.6} ${h-18} T${w} ${h-24} V${h} H0Z" fill="#7F9C8C"/>`;
+}
+const pill=(x,y,t,dark)=>{const w=t.length*5.6+16; return `<rect x="${x-w}" y="${y}" width="${w}" height="19" rx="9.5" fill="${dark?'#0F1A16':'#fff'}"/><text x="${x-w/2}" y="${y+13}" ${FB} font-size="9" font-weight="600" letter-spacing=".6" fill="${dark?'#fff':'#0F1A16'}" text-anchor="middle">${t}</text>`;};
+const money=n=>'$'+n.toLocaleString('en-US');
+const IMG={
+  thumb:(key,color)=>`<svg viewBox="0 0 62 62" aria-hidden="true"><rect width="62" height="62" fill="#DDE4E0"/>${garment(CATALOG[key].kind,color,6,5,.5)}</svg>`,
+  product:(key,color)=>{const p=CATALOG[key]; return `<svg class="media" viewBox="0 0 296 150" aria-hidden="true">${mist(296,150)}
+    ${garment(p.kind,color,98,20,1.05)}
+    <text x="14" y="24" ${FB} font-size="9.5" font-weight="600" letter-spacing="1.2" fill="#0F1A16">${p.k}</text>
+    ${p.badges.map((b,i)=>pill(284,12+i*24,b)).join('')}
+    ${pill(14+String(p.price).length*5.6+22,119,money(p.price),1)}</svg>`;},
+  compare:()=>{const rows=[['Waterproof','20K','30K'],['Fabric','Lightweight','3-layer Eyre Pro'],['Stretch','Mechanical','4-way'],['Waterproof zipper','No','Yes'],['Neck and side cinch','No','Yes'],['Best for','Travel rounds','Sustained rain']];
+    return `<svg class="media" viewBox="0 0 296 214" aria-hidden="true"><rect width="296" height="214" fill="#fff"/><rect width="296" height="58" fill="#0F1A16"/>
+    <text x="14" y="22" ${FB} font-size="9.5" letter-spacing="1.2" fill="#A9C2B7">COMPARE RAIN JACKETS</text>
+    <text x="122" y="44" ${F} font-size="14" font-weight="700" fill="#fff">Cleggan · $249</text><text x="214" y="44" ${F} font-size="14" font-weight="700" fill="#7FE0B6">Clifden · $549</text>
+    ${rows.map(([l,a,b],i)=>{const y=80+i*24; return `<path d="M14 ${y+8} H282" stroke="#E3E8E5"/><text x="14" y="${y}" ${FB} font-size="10.5" fill="#64716C">${l}</text><text x="122" y="${y}" ${FB} font-size="11" fill="#121A17">${a}</text><text x="214" y="${y}" ${FB} font-size="11" font-weight="600" fill="#17694B">${b}</text>`;}).join('')}</svg>`;},
+  cart:(lines)=>{const h=74+lines.length*30+40, tot=lines.reduce((a,l)=>a+l.price,0);
+    return `<svg class="media" viewBox="0 0 296 ${h}" aria-hidden="true"><rect width="296" height="${h}" fill="#fff"/><rect width="296" height="58" fill="#0F1A16"/>
+    <text x="14" y="24" ${F} font-size="15" font-weight="700" letter-spacing="3" fill="#fff">GALWAY</text><text x="14" y="43" ${FB} font-size="10.5" fill="#A9C2B7">Your cart · saved for you</text>
+    ${garment(CATALOG[lines[0].key]?.kind||'jacket','navy',236,8,.42)}
+    ${lines.map((l,i)=>{const y=84+i*30; return `<text x="14" y="${y}" ${FB} font-size="12" font-weight="600" fill="#121A17">${l.n}</text><text x="14" y="${y+13}" ${FB} font-size="10" fill="#64716C">${l.v}</text><text x="282" y="${y}" ${FB} font-size="12" font-weight="600" fill="#121A17" text-anchor="end">${money(l.price)}</text>`;}).join('')}
+    <path d="M14 ${h-40} H282" stroke="#E3E8E5"/><text x="14" y="${h-18}" ${FB} font-size="10.5" fill="#17694B" font-weight="600">Free ground shipping</text><text x="282" y="${h-16}" ${F} font-size="17" font-weight="700" fill="#121A17" text-anchor="end">${money(tot)}</text></svg>`;},
+  exchange:()=>`<svg class="media" viewBox="0 0 296 160" aria-hidden="true"><rect width="296" height="160" fill="#E4EAE7"/>
+    ${garment('pants','#9AA39F',34,18,1.1,104)}<path d="M40 138 H120" stroke="#B2452F" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="89" y="154" ${FB} font-size="10.5" fill="#64716C" text-anchor="middle" text-decoration="line-through">34 x 34</text>
+    <path d="M134 78 H166 M158 70 l9 8 -9 8" stroke="#0F1A16" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${garment('pants','navy',178,18,1.1,94)}<path d="M184 126 H264" stroke="#17694B" stroke-width="2"/>
+    <text x="233" y="154" ${FB} font-size="11.5" font-weight="600" fill="#17694B" text-anchor="middle">34 x 32</text>
+    ${pill(284,10,'2 IN SHORTER',1)}</svg>`,
+  label:()=>{let q=''; for(let r=0;r<11;r++)for(let c=0;c<11;c++){const corner=(r<3&&c<3)||(r<3&&c>7)||(r>7&&c<3); if(corner||((r*7+c*13+r*c)%3===0)) q+=`<rect x="${22+c*8}" y="${26+r*8}" width="7" height="7" fill="#0F1A16"/>`;}
+    return `<svg class="media" viewBox="0 0 296 140" aria-hidden="true"><rect width="296" height="140" fill="#fff"/><rect x="14" y="18" width="104" height="104" rx="6" fill="#fff" stroke="#D6DDD9"/>${q}
+    <text x="136" y="40" ${FB} font-size="9.5" letter-spacing="1.2" fill="#64716C">PREPAID RETURN LABEL</text><text x="136" y="66" ${F} font-size="20" font-weight="700" fill="#0F1A16">EX-20931</text>
+    <text x="136" y="86" ${FB} font-size="11" fill="#121A17">Claddagh · Navy Blue · 34 x 34</text><text x="136" y="102" ${FB} font-size="11" fill="#17694B" font-weight="600">No printer needed</text></svg>`;},
+  rewards:(pts)=>`<svg class="media" viewBox="0 0 296 124" aria-hidden="true"><rect width="296" height="124" fill="#0F1A16"/>
+    <text x="14" y="26" ${FB} font-size="9.5" letter-spacing="1.2" fill="#A9C2B7">GALWAY REWARDS</text>
+    <text x="14" y="68" ${F} font-size="38" font-weight="700" fill="#fff">${pts.toLocaleString('en-US')}</text><text x="${24+String(pts).length*23}" y="68" ${FB} font-size="12" fill="#A9C2B7">points after this order</text>
+    <rect x="14" y="84" width="268" height="6" rx="3" fill="#2A3A34"/><rect x="14" y="84" width="${268*Math.min(pts,1000)/1000}" height="6" rx="3" fill="#7FE0B6"/>
+    <text x="14" y="108" ${FB} font-size="10.5" fill="#A9C2B7">200 = $10 off</text><text x="282" y="108" ${FB} font-size="10.5" font-weight="600" fill="#7FE0B6" text-anchor="end">1,000 = $50 off</text></svg>`,
+  confirm:(t)=>`<svg class="media" viewBox="0 0 296 104" aria-hidden="true"><rect width="296" height="104" fill="#0F1A16"/><path d="M0 86 Q74 72 148 84 T296 80 V104 H0Z" fill="#1E7F5C" opacity=".55"/>
+    <circle cx="42" cy="46" r="21" fill="#7FE0B6"/><path d="M32 46 l7 7 13-15" stroke="#0F1A16" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <text x="76" y="44" ${F} font-size="19" font-weight="700" fill="#fff">${t}</text><text x="76" y="62" ${FB} font-size="11" fill="#A9C2B7">Galway Bay Apparel</text></svg>`
+};
+
+/* one card: image + title + description + buttons. btn = [label, act, icon, what-a-tap-says-in-live-mode] */
+function rcsCard({img,title,desc,btns=[],note}){
+  return `<div class="card" data-rcs="${note||'Card'}">${img}<div class="cb"><span class="cn">${esc(title)}</span>${desc?`<span class="cs">${esc(desc)}</span>`:''}</div>${btns.length?`<div class="cbtns">${btns.map(b=>`<button class="cbtn" type="button" data-act="${b[1]||'reply'}"${b[3]?` data-say="${esc(b[3])}"`:''}>${b[2]?`<span class="ai">${b[2]}</span>`:''}${esc(b[0])}</button>`).join('')}</div>`:''}</div>`;
+}
+const CARDS={
+  product:(key,color='navy',variant)=>{const p=CATALOG[key]; return rcsCard({img:IMG.product(key,color),title:p.name,desc:(variant?variant+' · ':'')+money(p.price)+(p.was?` (was ${money(p.was)})`:'')+(p.price>=175?' · Free shipping':''),
+    btns:[[`Add to cart · ${money(p.price)}`,'add','＋',`Add the ${p.name}${variant?' in '+variant:''} to my cart`]],note:'Product card · live Shopify data · action: add to cart'});},
+  clifden:()=>CARDS.product('clifden','navy','Navy / L'),
+  compare:()=>rcsCard({img:IMG.compare(),title:'Cleggan or Clifden?',desc:'For seven rounds on links: the Clifden. For a packable layer on travel days: the Cleggan.',
+    btns:[['Switch to the Clifden · $549','swap','','Switch my cart to the Clifden'],['Keep the Cleggan','keep','','I will keep the Cleggan']],note:'Comparison card · specs from the product pages'}),
+  claddagh:()=>rcsCard({img:IMG.product('claddagh','navy'),title:'Claddagh Chino Rain Pant',desc:'Navy Blue · 34 x 34 · $299\nWear it as your only golf pant.',
+    btns:[['Add to cart · $299','add','＋']],note:'Product card · live Shopify data · action: add to cart'}),
+  kylemore:()=>rcsCard({img:IMG.product('kylemore','black'),title:'Kylemore Hybrid Pullover',desc:'$229 · Insulated midlayer that fits under the Clifden.',
+    btns:[['Add to cart · $229','add','＋'],['No thanks','reply']],note:'Product card · offered once'}),
+  rewards:()=>rcsCard({img:IMG.rewards(948),title:'Join Galway Rewards, free',desc:'100 points for joining plus 848 on this order. A review after your trip is worth 100 more.',
+    btns:[['Join and check out','checkout','↗']],note:'Rewards card · points from the rewards program'}),
+  cartRcs:()=>rcsCard({img:IMG.cart([{n:'Clifden Golf Rain Jacket',v:'Navy · Large',price:549}]),title:'Your Clifden is saved',desc:'Navy · Large · in stock\nOrder by Wednesday for delivery before the 24th.',
+    btns:[['Checkout','checkout','↗'],['Ask a question','reply']],note:'RCS rich card · cart drawn into image · action: open checkout'}),
+  exchange:()=>rcsCard({img:IMG.exchange(),title:'Swap to 34 x 32',desc:'Free exchange · prepaid label\nYour new pair ships the day we receive the original.',
+    btns:[['Exchange for 34 x 32','exch','','Yes, exchange them for the 34 x 32'],['Refund instead','refund','','I would rather have a refund']],note:'RCS rich card · suggested replies: exchange or refund'}),
+  label:()=>rcsCard({img:IMG.label(),title:'Your prepaid label',desc:'Original packaging, tags on. Show this code at the drop-off.',
+    btns:[['Open code','code','↗'],['Find a drop-off','map','⌖']],note:'RCS rich card · label from the returns portal · actions: open link, map'}),
+  confirm:(t,sub)=>rcsCard({img:IMG.confirm(t),title:t,desc:sub,note:'Confirmation card'})
+};
+
+/* ===================== state: the storefront page + the Shopify cart/order ===================== */
+function freshCart(o={}){return Object.assign({title:'Shopify · Cart',sub:'Visitor on the Clifden product page',status:'Browsing',lines:[],pts:null,valL:'Cart value',queue:[],touches:0,
+  page:{key:'clifden',color:'navy',colorName:'Navy',sel:'L'}},o);}
+let S=freshCart();
+const ST={cart:['In cart','okc'],removed:['Removed','na'],declined:['Offered · declined','na'],paid:['Paid','okc'],delivered:['Delivered','okc'],ret:['Return requested','miss'],exch:['Exchange in progress','warnc'],kept:['Exchanged · kept','okc'],refund:['Refunded','na']};
+const COUNTS=['cart','paid','delivered','ret','exch','kept'];
+const total=s=>s.lines.filter(l=>COUNTS.includes(l.st)).reduce((a,l)=>a+l.price,0);
+
+const $=q=>document.querySelector(q);
+const thread=$('#thread'), log=$('#log');
+function el(h){const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild;}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function renderPage(){
+  const pg=S.page, p=CATALOG[pg.key], n=S.lines.filter(l=>l.st==='cart').length;
+  $('#url').textContent=BRAND.site+'/'+(pg.cart?'cart':p.url);
+  $('#pdp').innerHTML=pg.cart
+    ? `${IMG.thumb(pg.key,pg.color)}<div><div class="pn">Your cart</div><div class="pp">${n} item${n===1?'':'s'} · ${money(total(S))}</div><div class="sizes"><span class="on">${total(S)>=175?'Free shipping unlocked':'Add $'+(175-total(S))+' for free shipping'}</span></div></div>`
+    : `${IMG.thumb(pg.key,pg.color)}<div><div class="pn">${p.name}</div><div class="pp">${money(p.price)}.00 · ${pg.colorName}</div><div class="sizes">${p.sizes.map(s=>`<span class="${s===pg.sel?'on':''}">${s}</span>`).join('')}</div></div>`;
+  const b=$('#cartN'); if(b.dataset.n!==String(n)){ b.dataset.n=n; b.textContent=n; const c=$('#cartic'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
+}
+function renderBoard(flash){
+  $('#oTitle').textContent=S.title; $('#oSub').textContent=S.sub;
+  $('#mbody').innerHTML=S.lines.length?S.lines.map(l=>{const [t,c]=ST[l.st]; const off=l.st==='removed'||l.st==='declined'||l.st==='refund';
+    return `<tr class="${flash&&flash.includes(l.id)?'flash':''}"><td><b class="${off?'gone':''}">${esc(l.n)}</b></td><td><span class="cell">${esc(l.v)}</span></td><td><span class="cell${off?' gone':''}">${money(l.price)}</span></td><td><span class="cell ${c}">${l.note||t}</span></td></tr>`;}).join('')
+    :`<tr><td colspan="4"><span class="cell na">Cart is empty</span></td></tr>`;
+  $('#mval').textContent=money(total(S)); $('#mvalL').textContent=S.valL;
+  $('#mpts').textContent=S.pts==null?'—':S.pts.toLocaleString('en-US');
+  $('#mtouch').textContent=S.touches;
+  const st=$('#mstatus'); st.textContent=S.status; st.className='status '+(/Paid|Delivered|complete|Ready/i.test(S.status)?'st-ready':/Browsing|cart|Open|Exchange|Return/i.test(S.status)?'st-open':'st-air');
+  $('#mqueue').innerHTML=S.queue.length?S.queue.map(q=>`<div class="qi"><span class="status ${q.st==='done'?'st-ready':'st-open'}">${q.st==='done'?'Done':'New'}</span><span>${esc(q.t)}</span></div>`).join(''):'<span class="qnone">Nothing needs a person yet.</span>';
+  renderPage();
+}
+
+/* ===================== log ===================== */
+const KL={evt:'Event',think:'Think',tool:'Tool',rule:'Rule',write:'Write',human:'Team',send:'Send'};
+function logLine(it){
+  const e=log.querySelector('.empty'); if(e) e.remove();
+  let body='';
+  if(it.k==='think') body=`<span class="thought">${esc(it.t)}</span>`;
+  else if(it.k==='evt'||it.k==='send') body=esc(it.t);
+  else body=`<span class="fn">${esc(it.n)}</span><span class="args">(${esc(it.a||'')})</span><span class="res pend">running…</span>`;
+  const li=el(`<li><span class="k k-${it.k}">${KL[it.k]}</span><span class="t">${body}</span></li>`);
+  log.append(li); log.scrollTop=log.scrollHeight; return li;
+}
+function logResult(li,r,warn){const s=li.querySelector('.res'); if(!s) return; s.className='res'+(warn?' warn':''); s.textContent='→ '+r; log.scrollTop=log.scrollHeight;}
+function setAgent(on,txt){const s=$('#agentState'); s.className='state'+(on?'':' idle'); s.innerHTML=`<i></i>${txt||(on?'running':'idle')}`;}
+
+/* ===================== recorded runs ===================== */
+const line=(key,v,st,extra={})=>Object.assign({id:key,key,n:CATALOG[key].name,v,price:CATALOG[key].price,st},extra);
+const CLIF_PAGE={key:'clifden',color:'navy',colorName:'Navy',sel:'L'};
+const RUNS={
+ close:{label:'Close the sale',n:'1',surface:'web',title:'From a size question to a paid order',
+  blurb:'A shopper keeps switching between L and XL on a $549 jacket. The agent settles the size from Galway\'s guide, answers the delivery question, fills the cart, and when he leaves to think it over, follows up once by RCS the next morning.',
+  init:()=>freshCart({sub:'Visitor on the Clifden product page · Mon Oct 12',page:{...CLIF_PAGE}}),
+  beats:[
+   {stamp:'Mon, Oct 12 · 8:47 PM',m:'On the product page'},
+   {page:{sel:'XL'}},{page:{sel:'L'}},{page:{sel:'XL'}},
+   {log:[{k:'evt',t:'Storefront: visitor on Clifden Golf Rain Jacket for 2 min 10 s · size switched L ↔ XL three times'},
+     {k:'tool',n:'shopify.get_product',a:'"clifden-golf-rain-jacket"',r:'$549 · Black, Navy · XS to 3XL · 3-layer Eyre Pro 30K/30K'},
+     {k:'think',t:'Size hesitation on a $549 jacket. Open with the sizing question, not a discount.'}]},
+   {a:"Hi, I'm Galway's AI assistant. Deciding between L and XL on the Clifden? Tell me your chest size or what you wear in a golf polo and I'll point you to the right one."},
+   {p:"yeah. 42 chest, large in most polos, but i want a sweater under it. taking it to bandon on the 24th"},
+   {log:[{k:'rule',n:'sizeguide.lookup',a:'tops · chest 42 in',r:'L = 40.5 to 42.5 in · shells include room for a base layer and midlayer · broad shoulders: size up'},
+     {k:'think',t:'42 sits at the top of Large. One question settles it: shoulders.'}]},
+   {a:"At a 42-inch chest you're a Large. The Clifden is already cut with room for a base layer and a midlayer, so you don't need to size up for the sweater. One check: are your shoulders broad for your size? That's the one case where I'd say XL."},
+   {p:"no, pretty average. does it feel stiff when you swing? my old rain jacket is like wearing a tarp"},
+   {page:{sel:'L'}},
+   {log:[{k:'tool',n:'shopify.get_product',a:'clifden · fabric and features',r:'82% nylon / 18% spandex · 4-way stretch · silent fabric · PostureLock side cinch'}]},
+   {a:"Large it is. And no tarp: the fabric has 4-way stretch and stays quiet through the swing, and the PostureLock cinch inside the hand pockets keeps the jacket from ballooning when you're over the ball. It's still 30K waterproof with every seam sealed."},
+   {card:'clifden'},
+   {p:"will it get here before the 24th?"},
+   {log:[{k:'rule',n:'policy.lookup',a:'shipping',r:'ships within 1 business day · ground 2 to 6 business days · express 1 to 2 · free over $175'},
+     {k:'tool',n:'shopify.check_inventory',a:'Clifden · Navy · L',r:'in stock'},
+     {k:'think',t:'Order tonight, ships Tue Oct 13. Ground lands by Wed Oct 21 at the latest. Three days of margin.'}]},
+   {a:"Yes. Order tonight and it ships tomorrow. Ground takes 2 to 6 business days, so Wednesday the 21st at the latest, and shipping is free on this order. If the Large isn't right, you get one free exchange."},
+   {p:"ok add the navy large"},
+   {log:[{k:'write',n:'shopify.cart_add',a:'Clifden · Navy / L',r:'cart $549 · free shipping unlocked',fx:s=>{s.lines.push(line('clifden','Navy / L','cart')); s.status='In cart';},flash:['clifden']}]},
+   {a:"Done, it's in your cart.",chips:[['Checkout','checkout','↗'],['Keep shopping','reply']]},
+   {p:"need to run a $549 jacket past my wife first lol"},
+   {log:[{k:'think',t:"Not a no. Don't push and don't discount. Offer to save the cart to his phone, one reminder only."}]},
+   {a:"Fair enough. Want me to text you the cart so it's one tap when you're ready? One reminder, and that's it."},
+   {p:"sure. 503-555-0142"},
+   {log:[{k:'write',n:'consent.record',a:'text messages · cart reminder · 503-555-0142',r:'opt-in saved with timestamp and wording'},
+     {k:'write',n:'scheduler.set_followup',a:'open cart · Tue 9:00 AM',r:'scheduled',fx:s=>{s.sub='Visitor · opted in to texts · 503-555-0142';}}]},
+   {a:"Got it. You'll get one text from Galway tomorrow morning. Have a good night."},
+   {surface:'rcs'},
+   {stamp:'Tue, Oct 13 · 9:00 AM',m:'Next morning · RCS'},
+   {log:[{k:'evt',t:'Follow-up due: cart open 12 hours, no checkout'},
+     {k:'tool',n:'shopify.get_cart',a:'503-555-0142',r:'1 item · $549 · Navy / L still in stock'},
+     {k:'think',t:'His deadline is the 24th. Latest safe order for ground is Wed Oct 14: ships Thu, and six business days is Fri Oct 23. Say so plainly.'},
+     {k:'send',t:'RCS check: this phone supports rich cards · sending from the verified Galway sender'}]},
+   {a:"Good morning from Galway. Your Clifden in Navy, Large is saved and still in stock. Order by Wednesday and ground shipping gets it to you before the 24th."},
+   {card:'cartRcs'},
+   {p:"she said go for it"},
+   {a:"Great news. Tap Checkout on the card and you're done in a minute."},
+   {web:{title:'Checkout',sub:'Total before tax. Payment and address are entered on Shopify\'s checkout, never in the chat.',rows:[['Clifden Golf Rain Jacket','Navy / L','$549'],['Ground shipping','Arrives by Wed Oct 21','Free'],['Galway Rewards','Join free · 649 points','Added']],submit:'Pay $549'}},
+   {log:[{k:'evt',t:'Shopify: order #GB-48213 paid · $549 · customer Dan Mercer'},
+     {k:'write',n:'rewards.enroll',a:'Dan Mercer',r:'100 points for joining + 549 on this order',fx:s=>{s.title='Shopify · Order #GB-48213'; s.sub='Dan Mercer · ships Tue Oct 13 · ground'; s.lines[0].st='paid'; s.status='Paid'; s.pts=649; s.valL='Order value';},flash:['clifden']}]},
+   {conf:['Order confirmed','Order #GB-48213 · ships today. Tracking will arrive in this thread.']},
+   {a:"Thanks, Dan. Enjoy Bandon, and I hope you barely need it."},
+   {read:true}
+  ]},
+ kit:{label:'Upsell & cross-sell',n:'2',surface:'web',title:'The right jacket, then the rest of the kit',
+  blurb:'A shopper has a $249 pullover in his cart for a week of links golf in Ireland. The agent asks about the trip, recommends the jacket that fits it, adds the pant, takes no for an answer on a midlayer, and hands a custom-order question to the team.',
+  init:()=>freshCart({sub:'Visitor on the Cleggan product page · Wed Oct 14',status:'In cart',lines:[line('cleggan','Navy / L','cart')],valL:'Cart value · started at $249',page:{key:'cleggan',color:'navy',colorName:'Navy',sel:'L'}}),
+  beats:[
+   {stamp:'Wed, Oct 14 · 12:20 PM',m:'A question before checkout'},
+   {p:"is this pullover enough for a week of golf in ireland? going in april"},
+   {log:[{k:'evt',t:'Web chat opened on Cleggan Rain Pull Over · cart: Cleggan Navy / L $249'},
+     {k:'tool',n:'shopify.get_product',a:'"cleggan-rain-pull-over"',r:'$249 · 20K/20K · lightweight · packable · best for travel rounds'},
+     {k:'think',t:'Depends on how much golf and whether he walks. Ask before recommending anything.'}]},
+   {a:"That depends on how much golf you're packing in. How many rounds, and are you walking them?"},
+   {p:"7 rounds in 8 days, all links, all walking. lahinch and ballybunion are on the list"},
+   {log:[{k:'tool',n:'catalog.compare',a:'rain jackets',r:'Cleggan 20K, no waterproof zipper · Clifden 30K 3-layer, waterproof zipper, neck and side cinch · Corrib 30K, last run $299'},
+     {k:'think',t:'Seven walking rounds on the west coast means sustained rain and wind. The Cleggan is the wrong tool; say so and say why. Mention the cheaper 30K option too.'}]},
+   {a:"Then I'd move you up. The Cleggan is a light 20K layer made for a passing shower on a travel day. Seven walking rounds on the west coast is what the Clifden is built for: 30K, three layers, a waterproof zipper, and a neck cinch for the wind. It's $300 more. If that's too far, the Corrib is 30K as well at $299 while the last run lasts."},
+   {card:'compare'},
+   {p:"not spending all that on the trip to get soaked on day 2. switch it to the clifden"},
+   {log:[{k:'tool',n:'shopify.check_inventory',a:'Clifden · Navy · L',r:'in stock'},
+     {k:'write',n:'shopify.cart_swap',a:'Cleggan Navy / L → Clifden Navy / L',r:'cart $549',fx:s=>{s.lines[0].st='removed'; s.lines.push(line('clifden','Navy / L','cart')); s.page={...CLIF_PAGE}; s.sub='Visitor · Ireland trip in April';},flash:['clifden']}]},
+   {a:"Done: the Clifden in Navy, Large. It's cut with room for a layer, so your size carries over. What are you wearing on your legs?"},
+   {p:"just my regular rain pants, the pull on kind"},
+   {log:[{k:'tool',n:'shopify.get_product',a:'"claddagh-chino-rain-pant"',r:'$299 · 3-layer Eyre Pro 30K/30K · classic fit · worn as the only pant'},
+     {k:'tool',n:'reviews.search',a:'Claddagh · "Ireland"',r:'88 reviews · two describe Lahinch and Ballybunion in 40 mph wind and rain, dry all day'},
+     {k:'think',t:'Pull-ons work, but he is walking seven rounds. The Claddagh replaces pulling pants on and off. Offer it once.'}]},
+   {a:"Those will do the job. For a walking trip, look at the Claddagh Chino: the same 30K fabric as your jacket in a regular golf pant, so you wear it all day and never stop to pull anything on. Two reviewers wore them at Lahinch and Ballybunion in 40 mph wind and stayed dry. What waist and inseam do you wear?"},
+   {p:"34 waist. i'm 6'1 so 34 length i guess"},
+   {a:"34 x 34 it is. Galway's guide says to pick your usual trouser inseam, and if the length is off, one exchange is free."},
+   {card:'claddagh'},
+   {p:"ok add those too"},
+   {log:[{k:'tool',n:'shopify.check_inventory',a:'Claddagh · Navy Blue · 34 x 34',r:'in stock'},
+     {k:'write',n:'shopify.cart_add',a:'Claddagh · Navy Blue / 34 x 34',r:'cart $848',fx:s=>{s.lines.push(line('claddagh','Navy Blue / 34 x 34','cart')); s.page.cart=true;},flash:['claddagh']}]},
+   {a:"Added. One more and then I'll leave you alone: the Clifden has room for a midlayer on cold mornings."},
+   {card:'kylemore'},
+   {p:"nah i've got plenty of quarter zips"},
+   {log:[{k:'think',t:'Clear no. Log it and move on; no second ask.'},
+     {k:'write',n:'crm.log_offer',a:'Kylemore · declined',r:'saved · will not be offered again',fx:s=>{s.lines.push(line('kylemore','Midlayer','declined'));},flash:['kylemore']},
+     {k:'tool',n:'rewards.preview',a:'cart $848 · not a member',r:'100 joining + 848 order = 948 points · 1,000 = $50 off'}]},
+   {a:"Then you're set on layers. Last thing, and it's free: join Galway Rewards before you check out. This order puts you at 948 points, 52 short of $50 off, and a review after the trip is worth 100."},
+   {card:'rewards'},
+   {web:{title:'Checkout',sub:'Total before tax. Payment and address are entered on Shopify\'s checkout, never in the chat.',rows:[['Clifden Golf Rain Jacket','Navy / L','$549'],['Claddagh Chino Rain Pant','Navy Blue / 34 x 34','$299'],['Ground shipping','2 to 6 business days','Free'],['Galway Rewards','Join free · 948 points','Added']],submit:'Pay $848'}},
+   {log:[{k:'evt',t:'Shopify: order #GB-48377 paid · $848 · customer Chris Halloran'},
+     {k:'write',n:'rewards.enroll',a:'Chris Halloran',r:'948 points',fx:s=>{s.title='Shopify · Order #GB-48377'; s.sub='Chris Halloran · ships Thu Oct 15 · ground'; s.lines.forEach(l=>{if(l.st==='cart') l.st='paid';}); s.status='Paid'; s.pts=948; s.valL='Order value · cart started at $249';},flash:['clifden','claddagh']}]},
+   {conf:['Order confirmed','Order #GB-48377 · $848 · ships tomorrow.']},
+   {p:"one more thing. do you do logo'd jackets? we need about 24 for our member-guest"},
+   {log:[{k:'rule',n:'policy.lookup',a:'custom and team orders',r:'nothing published',warn:1},
+     {k:'think',t:'No published policy or pricing. Do not guess. Capture the details and hand it to a person.'},
+     {k:'human',n:'team.create_lead',a:'"about 24 logo\'d jackets, member-guest" · Chris Halloran · order #GB-48377',r:'in the team inbox with this conversation',fx:s=>{s.queue.push({st:'open',t:"Lead: about 24 logo'd jackets for a member-guest · Chris Halloran"}); s.touches=1;}}]},
+   {a:"I don't have pricing for custom orders, so I won't guess. I've passed your request to the Galway team with your details and this order, and someone will email you."},
+   {read:true}
+  ]},
+ exchange:{label:'Exchange, not a return',n:'3',surface:'rcs',title:'A return request that ends as an exchange',
+  blurb:'Five days later the order arrives and the pants are too long. The shopper texts to return them. The agent asks why, offers the inseam that fixes it with a prepaid label, and keeps the refund one tap away. The $299 stays a sale.',
+  init:()=>freshCart({title:'Shopify · Order #GB-48377',sub:'Chris Halloran · ordered Oct 14 · opted in to texts',status:'Delivered',lines:[line('clifden','Navy / L','delivered'),line('claddagh','Navy Blue / 34 x 34','delivered')],pts:948,valL:'Order value',page:{...CLIF_PAGE}}),
+  beats:[
+   {stamp:'Mon, Oct 19 · 4:12 PM',m:'Delivered'},
+   {log:[{k:'evt',t:'Carrier: order #GB-48377 delivered 4:09 PM'}]},
+   {a:"Your Galway order just arrived. If anything is off with the fit, reply here and I'll sort it out."},
+   {stamp:'Tue, Oct 20 · 7:35 PM',m:'Return request'},
+   {p:"jacket is great but i need to return the pants"},
+   {log:[{k:'evt',t:'Inbound RCS from Chris Halloran'},
+     {k:'tool',n:'shopify.get_order',a:'#GB-48377',r:'Clifden Navy / L $549 · Claddagh Navy Blue / 34 x 34 $299 · delivered Oct 19 · inside the 30-day window',fx:s=>{s.lines[1].st='ret'; s.status='Return requested'; s.valL='Order value · $299 at risk';},flash:['claddagh']},
+     {k:'think',t:'A return request with no reason. Ask why before sending a label; if it is fit, an exchange fixes it.'}]},
+   {a:"Glad the jacket's a keeper, and sorry about the pants. What's off with them: the waist, the length, or something else?"},
+   {p:"too long. they bunch up over my shoes. waist is fine"},
+   {log:[{k:'rule',n:'sizeguide.lookup',a:'pants · inseam',r:'inseams 28 / 30 / 32 / 34 · hem should rest on the shoe without puddling'},
+     {k:'tool',n:'shopify.check_inventory',a:'Claddagh · Navy Blue · 34 x 32',r:'in stock'},
+     {k:'rule',n:'policy.lookup',a:'exchanges',r:'one free exchange per order · within 30 days · unworn, unwashed, tags attached · prepaid label'},
+     {k:'think',t:'Length only, waist fine: 34 x 32 solves it and keeps the $299 sale. Offer the exchange first. The refund stays on the card.'}]},
+   {a:"That's an easy fix. Your waist is right, so a 34 x 32 takes two inches off the length, and it's in stock in Navy Blue. The swap is free and I'll send a prepaid label. Have you worn them outside or washed them?"},
+   {p:"no just tried them on in the house"},
+   {a:"Then you're eligible. Which would you like?"},
+   {card:'exchange'},
+   {tap:'Exchange for 34 x 32'},
+   {log:[{k:'write',n:'returns.create_exchange',a:'#GB-48377 · Claddagh 34 x 34 → 34 x 32',r:'exchange EX-20931 · prepaid label created',fx:s=>{s.lines[1].st='exch'; s.lines[1].note='Exchange → 34 x 32'; s.status='Exchange open'; s.valL='Order value · $299 kept';},flash:['claddagh']},
+     {k:'write',n:'shopify.reserve_inventory',a:'Claddagh · Navy Blue · 34 x 32 · qty 1',r:'held for EX-20931'}]},
+   {card:'label'},
+   {p:"do i have to wait until you get them back?"},
+   {log:[{k:'rule',n:'policy.lookup',a:'exchange timing',r:'most exchanges ship the same day the original is received'}]},
+   {a:"Only until they reach our returns center. Most exchanges ship the same day we receive the original, and I'll text you the tracking."},
+   {stamp:'Fri, Oct 23 · 11:20 AM',m:'Exchange shipped'},
+   {log:[{k:'evt',t:'Returns center, Plainfield IN: original received · unworn, tags attached'},
+     {k:'write',n:'returns.complete_exchange',a:'EX-20931',r:'34 x 32 shipped',fx:s=>{s.lines[1].v='Navy Blue / 34 x 32'; s.lines[1].st='kept'; s.lines[1].note=''; s.status='Exchange complete';},flash:['claddagh']}]},
+   {conf:['Your 34 x 32 has shipped','Exchange EX-20931 · tracking will follow in this thread.']},
+   {stamp:'Wed, Oct 28 · 6:00 PM',m:'Fit check'},
+   {a:"How's the length on the new pair?",chips:[['Perfect'],['Still off']]},
+   {tap:'Perfect'},
+   {log:[{k:'write',n:'crm.log_outcome',a:'exchange kept · no refund',r:'saved · $848 of $848 retained',fx:s=>{s.valL='Order value · $848 of $848 kept';}},
+     {k:'think',t:'Happy with both pieces. He is 52 points from $50 off and a review is worth 100. Ask once.'}]},
+   {a:"Good to hear. One small thing: a review of either piece earns 100 Rewards points, which takes you past 1,000, good for $50 off your next order.",chips:[['Write a review','review','↗'],['Maybe later','reply']]},
+   {read:true}
+  ]}
+};
+
+/* ===================== player ===================== */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let cur='close', token=0, paused=false, LIVE=false, SPEED=1, PH='Ask anything';
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function wait(ms,tk){ms=reduce?Math.min(ms,60):ms/SPEED; let t=0; while(t<ms){ if(tk!==token) return false; await sleep(50); if(!paused) t+=50; } return tk===token;}
+function scrollThread(){thread.scrollTop=thread.scrollHeight;}
+function addRow(h,me){thread.querySelectorAll('.row.chips').forEach(r=>r.remove()); thread.append(el(`<div class="row${me?' me':''}">${h}</div>`)); scrollThread();}
+function addCard(kind,...a){addRow(CARDS[kind](...a));}
+const bub=(t)=>`<div class="bub" data-rcs="Text · written by the AI agent or typed by the shopper">${esc(t)}</div>`;
+const typing=()=>el(`<div class="row"><div class="bub typing"><span></span><span></span><span></span></div></div>`);
+function addChips(chips){thread.append(el(`<div class="row chips"><div class="chiprow" data-rcs="Quick replies and actions · shown under the latest message">${chips.map(c=>`<button class="chip" type="button" data-act="${c[1]||'reply'}"${c[3]?` data-say="${esc(c[3])}"`:''}>${c[2]?`<span class="ai">${c[2]}</span>`:''}${esc(c[0])}</button>`).join('')}</div></div>`)); scrollThread();}
+/* the device is the storefront window (web chat) or a phone (RCS) */
+function applySurface(kind){
+  const d=$('#device'); d.classList.remove('web','rcs','swap'); d.classList.add(kind);
+  PH=kind==='web'?'Ask anything':'RCS message';
+  $('#surfaceTag').innerHTML=kind==='web'?`<i></i><b>Web chat</b> on ${BRAND.site}`:`<i></i><b>RCS</b> on the shopper's phone`;
+  const box=$('#cbox'); if(box.classList.contains('ph')) box.textContent=PH;
+}
+async function setSurface(kind,tk){
+  const d=$('#device'); if(d.classList.contains(kind)) return true;
+  d.classList.add('swap'); if(!await wait(450,tk)) return false;
+  closeWebview(); thread.innerHTML=''; applySurface(kind);
+  return await wait(450,tk);
+}
+/* checkout sheet: what "Checkout" opens. No payment details are ever typed into the chat. */
+const LOCK='<svg viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="6" rx="1.2" fill="currentColor"/><path d="M4 5V3.6a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>';
+function closeWebview(){ $('#webview').classList.remove('open'); $('#scrim').classList.remove('open'); $('#webview').setAttribute('aria-hidden','true'); }
+async function runWebview(tk,live,cfg){
+  const wv=$('#webview');
+  wv.innerHTML=`<div class="wv-grab"></div><div class="wv-bar"><b>${LOCK}${esc(BRAND.site)}</b><span>Secure checkout</span></div>
+    <div class="wv-body"><h5>${esc(cfg.title)}</h5><p>${esc(cfg.sub)}</p>
+    ${cfg.rows.map(([a,b,c])=>`<div class="wv-row done"><span>${esc(a)}<small>${esc(b)}</small></span><span class="st">${esc(c)}</span></div>`).join('')}
+    <button class="wv-submit" id="wvSubmit" type="button" disabled>${esc(cfg.submit)}</button></div>`;
+  wv.setAttribute('aria-hidden','false'); $('#scrim').classList.add('open'); wv.classList.add('open');
+  if(!await wait(1300,tk)) return false;
+  const sb=$('#wvSubmit'); sb.disabled=false;
+  if(live){ await new Promise(res=>{ sb.onclick=res; }); }
+  else { if(!await wait(900,tk)) return false; sb.textContent='Processing…'; if(!await wait(700,tk)) return false; }
+  closeWebview(); return tk===token;
+}
+async function typeIntoComposer(text,tk){
+  const box=$('#cbox'); box.classList.remove('ph');
+  for(let i=1;i<=text.length;i++){ box.innerHTML=esc(text.slice(0,i))+'<span class="caret"></span>'; if(!await wait(reduce?0:22,tk)) return false; }
+  $('#sendBtn').disabled=false; if(!await wait(300,tk)) return false;
+  box.textContent=PH; box.classList.add('ph'); $('#sendBtn').disabled=true; return true;
+}
+async function play(){
+  const tk=token, run=RUNS[cur];
+  setAgent(true);
+  for(const b of run.beats){
+    if(tk!==token) return;
+    if(b.surface){ if(!await setSurface(b.surface,tk)) return; continue; }
+    if(b.page){ Object.assign(S.page,b.page); renderPage(); if(!await wait(520,tk)) return; continue; }
+    if(b.stamp){ thread.append(el(`<div class="stamp">${b.stamp}</div>`)); markMoment(b.m); if(!await wait(500,tk)) return; continue; }
+    if(b.tap){ const c=[...thread.querySelectorAll('.chip,.cbtn')].reverse().find(x=>x.textContent.trim().endsWith(b.tap)); if(!await wait(900,tk)) return; if(c) c.classList.add('press'); if(!await wait(450,tk)) return; addRow(bub(b.tap),true); if(!await wait(500,tk)) return; continue; }
+    if(b.read){ thread.append(el(`<div class="read">Read</div>`)); scrollThread(); continue; }
+    if(b.p){ if(!await wait(700,tk)) return; if(!await typeIntoComposer(b.p,tk)) return; addRow(bub(b.p),true); if(!await wait(500,tk)) return; continue; }
+    if(b.web){ const btn=[...thread.querySelectorAll('[data-act="checkout"]')].pop(); if(!await wait(800,tk)) return; if(btn) btn.classList.add('press'); if(!await wait(500,tk)) return; if(btn) btn.classList.remove('press'); if(!await runWebview(tk,false,b.web)) return; continue; }
+    if(b.log){
+      const ty=typing(); thread.append(ty); scrollThread();
+      for(const it of b.log){ const li=logLine(it); if(!await wait(it.k==='think'?900:650,tk)) return;
+        if(it.k!=='think'&&it.k!=='evt'&&it.k!=='send'){ logResult(li,it.r,it.warn); }
+        if(it.fx){ it.fx(S); renderBoard(it.flash); }
+        if(!await wait(450,tk)) return; }
+      ty.remove(); continue; }
+    if(b.a){ const ty=typing(); thread.append(ty); scrollThread();
+      if(!await wait(Math.min(1500,500+b.a.length*6),tk)) return; ty.remove(); addRow(bub(b.a)); if(b.chips) addChips(b.chips); if(!await wait(b.chips?1300:900,tk)) return; continue; }
+    if(b.card){ if(!await wait(350,tk)) return; addCard(b.card); if(!await wait(1200,tk)) return; continue; }
+    if(b.conf){ addRow(CARDS.confirm(b.conf[0],b.conf[1])); if(!await wait(900,tk)) return; }
+  }
+  setAgent(false,'run complete');
+}
+function markMoment(m){ if(!m) return; document.querySelectorAll('.moments li').forEach(li=>{ if(li.classList.contains('on')) li.classList.replace('on','past'); if(li.dataset.m===m) li.classList.add('on'); }); }
+function resetDevice(){closeWebview(); thread.innerHTML=''; log.innerHTML='<li class="empty">Agent steps appear here as they happen.</li>';}
+const HINT='A recorded agent run. Nothing is scripted as buttons: the shopper types, the agent decides what to do.';
+function select(key){
+  cur=key; token++; paused=false; $('#pause').textContent='Pause';
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.k===key));
+  LIVE=key==='live';
+  $('#screen').classList.toggle('live-on',LIVE);
+  resetDevice();
+  if(LIVE){ applySurface('web'); startLive(); return; }
+  stopLiveUI();
+  const r=RUNS[key]; S=r.init(); applySurface(r.surface); renderBoard();
+  $('#scene').innerHTML=`<h3>${r.title}</h3><p>${r.blurb}</p><ol class="moments" aria-label="Moments in this run">${r.beats.filter(b=>b.m).map(b=>`<li data-m="${esc(b.m)}">${esc(b.m)}</li>`).join('')}</ol>`;
+  play();
+}
+
+/* ===================== live mode: the viewer is the shopper ===================== */
+let sample=null, liveTools=false, turns=[], busy=false, ctl=null;
+const POLICY={
+  shipping:'Free standard shipping on US orders over $175; orders under that ship at a flat rate. Orders ship within one business day (Monday to Friday), generally via FedEx. Standard ground takes 2 to 6 business days. Express delivery takes 1 to 2 business days. Every order is trackable.',
+  international:'Galway ships internationally. The customer pays any import costs such as taxes, duties or brokerage fees.',
+  returns_exchanges:'A return or exchange can be requested within 30 days. Items must be unworn, unwashed and unaltered, in original packaging with tags attached. One free exchange per order with a prepaid label; further exchanges on the same order are at the customer\'s shipping cost. Final Sale items cannot be returned or exchanged. If an order included a free gift, the gift must come back for a full refund. Most exchanges ship the same day the original is received.',
+  rewards:'Galway Rewards is free to join. 100 points for joining, 1 point per $1 spent, 100 for a birthday, 100 for a review, 150 for a photo review, 200 for a video review. 200 points = $10 off, 400 = $20, 1,000 = $50, 1,500 = $75. Refer a friend: they get 20% off a first purchase of $50 or more and you get 20% off.',
+  care:'Machine wash cold on gentle with mild liquid detergent. No powder detergent, bleach or fabric softener. Tumble dry low or line dry; low heat helps restore water repellency. Re-apply a DWR spray when water stops beading.',
+  discounts:'The assistant cannot create discounts or codes. Published offers only: the Sale collection, Galway Rewards points, and refer-a-friend.'
+};
+const SIZEGUIDE={
+  tops:'Chest: XS 35-36.5 in, S 36.5-38.5, M 38.5-40.5, L 40.5-42.5, XL 42.5-44.5, 2XL 44.5-46.5, 3XL 46.5-48.5. From pant waist: 28 = XS, 30 = S, 32 = M, 34 = L, 36 = XL, 38 = 2XL, 40-42 = 3XL. True to size. Rain jackets already include room for a base layer and a midlayer, so most golfers do not size up; with broad shoulders, size up. Between sizes: smaller for a streamlined fit, larger if layering heavy fleece.',
+  pants:'Waist: 30 fits 29-31 in, 32 fits 31-33, 34 fits 33-35, 36 fits 35-37, 38 fits 37-39, 40 fits 39-41, 42 fits 41-43. Choose your standard trouser inseam; the hem should rest on the golf shoe without puddling. Claddagh Chino is a Classic fit with room for a base layer. Spiddal Five Pocket is a Tailored fit with a tapered leg. Ayle and Silverstrand are over-pants that pull on over shorts or trousers.'
+};
+function cartLines(){return S.lines.filter(l=>l.st==='cart');}
+function ctxJSON(){return{page:S.page.cart?'cart':CATALOG[S.page.key].name+' product page',cart:cartLines().map(l=>({product:l.n,variant:l.v,price:l.price})),cart_total:total(S),free_shipping:total(S)>=175,rewards_member:S.pts!=null,rewards_points:S.pts,
+  past_order:S.lines.filter(l=>l.past).map(l=>({order:'#GB-47702',product:l.n,variant:l.v,price:l.price,delivered:'Oct 6, 2026',status:ST[l.st][0],eligible_for_free_exchange:l.st==='past'}))[0]||null,team_inbox:S.queue};}
+function liveRules(){return `You are the AI sales assistant for Galway Bay Apparel (galwaybaygolf.com), premium golf rain gear. Tagline: "Never Miss a Day." You are chatting in the website chat widget with a shopper who is on the Clifden Golf Rain Jacket product page. Today is Monday Oct 12, 2026.
+
+Your job: help the shopper buy the right gear, build the right kit, and keep a sale when they ask for a return.
+
+Rules:
+- Reply like Galway's best sales rep: warm, direct, 1 to 3 short sentences, plain text, no markdown, no emoji, no lists.
+- Use tools. Never state a price, spec, size, stock level, policy or delivery time that a tool did not give you. Use get_product or search_catalog for products, size_guide for fit, check_policy for shipping, returns, rewards, care and discounts, check_inventory before promising stock.
+- Sizing: ask for the one measurement you need, then give one clear size.
+- Recommend for the shopper's conditions. If a cheaper product fits their need, say so. Suggest at most one add-on at a time (a pant with a jacket, a midlayer under a shell) and if they decline, do not ask again.
+- When they want an item, add it with update_cart, and show a product card with show_card when it helps. When they are ready to buy, call show_card with type checkout. You cannot take payment in chat.
+- Never invent discounts or codes. If asked, check_policy discounts and point to what is published.
+- Returns: the shopper has a past order (see context). If they ask to return it, first ask why. If the reason is size or length, offer the exchange for the right size first with resolve_return, and say the refund is available too. If they still want a refund, process it with resolve_return without arguing.
+- Hand anything unusual to a person with handoff_to_team: custom or team orders, damaged items, complaints, anything policy does not cover. Tell the shopper you have passed it on.
+- Do not narrate tool calls. Call the tools you need first, then write only your message to the shopper.
+
+Context: ${JSON.stringify(ctxJSON())}`;}
+function findProduct(q){const s=String(q||'').toLowerCase(); return Object.keys(CATALOG).find(k=>s.includes(k))||Object.keys(CATALOG).find(k=>CATALOG[k].name.toLowerCase().includes(s)&&s.length>3);}
+const kindOf=n=>n.startsWith('handoff')?'human':(n==='check_policy'||n==='size_guide')?'rule':(n==='update_cart'||n==='resolve_return'||n==='enroll_rewards')?'write':'tool';
+function tool(name,args){return logLine({k:kindOf(name),n:name,a:Object.entries(args||{}).map(([k,v])=>`${k}: ${typeof v==='string'?'"'+v+'"':v}`).join(', ')});}
+const TOOLS=[
+ {name:'get_context',description:'Returns the page the shopper is on, their cart, Rewards status, their past order and the team inbox.',
+  execute:()=>{const li=tool('shopify.get_context',{}); const c=ctxJSON(); logResult(li,`cart ${money(c.cart_total)} · ${c.cart.length} item${c.cart.length===1?'':'s'}`); return c;}},
+ {name:'search_catalog',description:'Lists Galway products with prices and a one-line summary. Filter by category: rain jacket, pants, midlayer, vest, or all.',
+  inputSchema:{type:'object',properties:{category:{type:'string',enum:['rain jacket','pants','midlayer','vest','all']}},required:['category']},
+  execute:i=>{const c=String(i.category||'all'); const li=tool('catalog.search',{category:c}); const r=Object.entries(CATALOG).filter(([k,p])=>c==='all'||p.cat===c).map(([k,p])=>({product:k,name:p.name,price:p.price,was:p.was||undefined,summary:p.facts.split('. ')[0]})); logResult(li,`${r.length} products`); return r;}},
+ {name:'get_product',description:'Returns full details for one product: price, colors, sizes, fabric, features and what it is best for.',
+  inputSchema:{type:'object',properties:{product:{type:'string',enum:Object.keys(CATALOG)}},required:['product']},
+  execute:i=>{const k=findProduct(i.product); const li=tool('shopify.get_product',{product:String(i.product)}); if(!k){logResult(li,'not found',1); throw new Error('Unknown product. Use search_catalog.');} const p=CATALOG[k]; logResult(li,`${p.name} · ${money(p.price)}`); return {name:p.name,price:p.price,was:p.was,colors:p.colors,sizes:p.sizes.join(', '),details:p.facts};}},
+ {name:'size_guide',description:'Returns Galway\'s size and fit guide text for tops (jackets, layers) or pants.',
+  inputSchema:{type:'object',properties:{type:{type:'string',enum:['tops','pants']}},required:['type']},
+  execute:i=>{const t=String(i.type)==='pants'?'pants':'tops'; const li=tool('size_guide',{type:t}); logResult(li,SIZEGUIDE[t].slice(0,80)+'…'); return SIZEGUIDE[t];}},
+ {name:'check_policy',description:'Look up Galway-approved policy text for a topic.',
+  inputSchema:{type:'object',properties:{topic:{type:'string',enum:Object.keys(POLICY)}},required:['topic']},
+  execute:i=>{const t=String(i.topic); const li=tool('check_policy',{topic:t}); if(!POLICY[t]){logResult(li,'nothing published',1); throw new Error('No policy for that topic. Hand off to the team if needed.');} logResult(li,POLICY[t].slice(0,80)+'…'); return POLICY[t];}},
+ {name:'check_inventory',description:'Checks whether a product variant (color and size) is in stock.',
+  inputSchema:{type:'object',properties:{product:{type:'string'},variant:{type:'string'}},required:['product','variant']},
+  execute:i=>{const k=findProduct(i.product); const li=tool('shopify.check_inventory',{product:String(i.product),variant:String(i.variant)}); if(!k){logResult(li,'unknown product',1); throw new Error('Unknown product');} logResult(li,'in stock'); return 'in stock';}},
+ {name:'update_cart',description:'Add a product variant to the shopper\'s cart or remove a product from it. Returns the cart.',
+  inputSchema:{type:'object',properties:{action:{type:'string',enum:['add','remove']},product:{type:'string',enum:Object.keys(CATALOG)},variant:{type:'string',description:'Color and size, e.g. "Navy / L" or "Navy Blue / 34 x 32"'}},required:['action','product']},
+  execute:i=>{const k=findProduct(i.product), act=String(i.action), v=String(i.variant||''); const li=tool(act==='remove'?'shopify.cart_remove':'shopify.cart_add',{product:String(i.product),variant:v});
+    if(!k){logResult(li,'unknown product',1); throw new Error('Unknown product');}
+    if(act==='remove'){ const l=cartLines().find(x=>x.key===k); if(!l){logResult(li,'not in cart',1); throw new Error('That product is not in the cart');} l.st='removed'; }
+    else{ if(!v){logResult(li,'variant needed',1); throw new Error('Ask the shopper for color and size first');} S.lines.push(line(k,v,'cart')); S.page.cart=true; }
+    S.status=cartLines().length?'In cart':'Browsing'; renderBoard([k]); logResult(li,`cart ${money(total(S))}`); return ctxJSON();}},
+ {name:'show_card',description:'Show a card in the chat. type product: a product card with an Add to cart button (give product, and variant if known). type checkout: the cart with a Checkout button.',
+  inputSchema:{type:'object',properties:{type:{type:'string',enum:['product','checkout']},product:{type:'string',enum:Object.keys(CATALOG)},variant:{type:'string'}},required:['type']},
+  execute:i=>{const t=String(i.type); const li=tool('chat.show_card',{type:t,product:String(i.product||'')});
+    if(t==='checkout'){ const c=cartLines(); if(!c.length){logResult(li,'cart is empty',1); throw new Error('The cart is empty');} addRow(rcsCard({img:IMG.cart(c),title:'Your cart',desc:`${c.length} item${c.length===1?'':'s'} · ${money(total(S))} before tax`,btns:[['Checkout','checkout','↗']],note:'Cart card · action: open Shopify checkout'})); }
+    else{ const k=findProduct(i.product); if(!k){logResult(li,'unknown product',1); throw new Error('Unknown product');} addCard('product',k,/black/i.test(i.variant||'')?'black':'navy',i.variant?String(i.variant):''); }
+    logResult(li,'shown'); return 'shown';}},
+ {name:'resolve_return',description:'Resolve a return request on the past order. resolution exchange: swaps for new_variant with a free prepaid label. resolution refund: starts a refund with a prepaid label.',
+  inputSchema:{type:'object',properties:{resolution:{type:'string',enum:['exchange','refund']},new_variant:{type:'string'},reason:{type:'string'}},required:['resolution','reason']},
+  execute:i=>{const ex=String(i.resolution)==='exchange'; const li=tool(ex?'returns.create_exchange':'returns.create_refund',{order:'#GB-47702',reason:String(i.reason),...(ex?{new_variant:String(i.new_variant||'')}:{})});
+    const l=S.lines.find(x=>x.past); if(!l||l.st!=='past'){logResult(li,'already resolved',1); throw new Error('This order already has a return or exchange');}
+    if(ex&&!i.new_variant){logResult(li,'new size needed',1); throw new Error('Ask which size they need first');}
+    l.st=ex?'pexch':'pref'; l.note=ex?'Exchange → '+String(i.new_variant):''; renderBoard([l.id]); addCard('label'); logResult(li,ex?'exchange created · prepaid label sent':'refund started · prepaid label sent'); return ex?'Exchange created. Prepaid label shown to the shopper. New item ships when the original is received.':'Refund started. Prepaid label shown to the shopper.';}},
+ {name:'enroll_rewards',description:'Enrolls the shopper in Galway Rewards (free). Returns their points.',
+  execute:()=>{const li=tool('rewards.enroll',{}); if(S.pts==null) S.pts=100; renderBoard(); logResult(li,`${S.pts} points`); return {points:S.pts,note:'1 point per $1 is added when an order is paid'};}},
+ {name:'handoff_to_team',description:'Creates an item in the Galway team inbox when something needs a person. Returns the status.',
+  inputSchema:{type:'object',properties:{reason:{type:'string'}},required:['reason']},
+  execute:i=>{const li=tool('handoff_to_team',{reason:String(i.reason)}); S.queue.push({st:'open',t:String(i.reason)}); S.touches++; renderBoard(); logResult(li,'in the team inbox'); return 'In the team inbox. A person will follow up by email.';}}
+];
+const SUGG=["42 chest. L or XL in the Clifden?","Is the Cleggan enough for a week in Ireland?","What pants go with this jacket?","Can I get a discount?","The pants from my last order are too long. I want to return them"];
+function liveInit(){const s=freshCart({sub:'You · on the Clifden product page · past order #GB-47702',page:{...CLIF_PAGE}});
+  s.lines.push(line('claddagh','Navy Blue / 34 x 34','past',{id:'past',past:true})); return s;}
+Object.assign(ST,{past:['Past order · delivered Oct 6','na'],pexch:['Exchange started','warnc'],pref:['Refund started','miss']});
+
+function stopLiveUI(){
+  $('#ctl').hidden=false; $('#sugg').hidden=true; $('#hint').textContent=HINT;
+  const box=$('#cbox'); box.className='cbox ph'; box.textContent=PH; $('#sendBtn').disabled=true;
+}
+async function startLive(){
+  S=liveInit(); renderBoard(); turns=[]; busy=false; ctl?.abort();
+  $('#ctl').hidden=true;
+  $('#scene').innerHTML=`<h3>Your turn: you're the shopper</h3><p>Ask anything a customer would. A real AI agent reads the Galway catalog and size guide, checks policy, fills your cart and can turn a return into an exchange, live. It runs on your own Claude account.</p>`;
+  thread.append(el(`<div class="stamp">Mon, Oct 12 · now</div>`));
+  addRow(bub("Hi, I'm Galway's AI assistant. Ask me about sizing, what to wear for your trip, shipping, or an order you already have."));
+  addCard('product','clifden','navy','');
+  const box=$('#cbox'); box.className='cbox';
+  if(!sample){ sample=window.claude?.use ? await window.claude.use('sample').catch(()=>null) : null; if(sample){ try{ const l=await sample.limits(); liveTools=!!l.tools&&(l.tools.maxCount??99)>=TOOLS.length; }catch{ liveTools=false; } } }
+  if(!LIVE) return;
+  if(!sample||!liveTools){ box.className='cbox ph'; box.textContent='Live mode runs inside Claude'; setAgent(false,'unavailable');
+    $('#hint').textContent='Live mode needs the Claude viewer with AI access. The three recorded runs show the same agent.'; return; }
+  box.innerHTML='<input id="liveIn" placeholder="Ask as a shopper…" maxlength="400" aria-label="Message to the Galway assistant">';
+  const inp=$('#liveIn'); inp.oninput=()=>{$('#sendBtn').disabled=busy||!inp.value.trim();};
+  $('#sugg').hidden=false; $('#sugg').innerHTML=SUGG.map(s=>`<button type="button">${esc(s)}</button>`).join('');
+  $('#sugg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(!busy) sendLive(b.textContent); });
+  $('#hint').textContent='The first message asks you to allow AI. Each reply takes a few seconds while the agent works.';
+  setAgent(false,'waiting for the shopper');
+}
+async function sendLive(text,opts={}){
+  if(busy||!text.trim()) return; busy=true; $('#sendBtn').disabled=true; const inp=$('#liveIn'); if(inp) inp.value='';
+  const tk=token;
+  if(!opts.silent) addRow(bub(text),true);
+  turns.push({role:'user',content:text});
+  logLine({k:'evt',t:opts.silent?'Shopify checkout webhook received':'Message from the shopper'});
+  const ty=typing(); thread.append(ty); scrollThread();
+  setAgent(true,'thinking'); ctl=new AbortController(); let rb=null;
+  const lastPara=t=>(t.split(/\n\s*\n/).filter(x=>x.trim()).pop()||t).trim();
+  try{
+    const {text:reply}=await sample([{role:'user',content:liveRules()},...turns.slice(-12)],{modelTier:'quick',signal:ctl.signal,tools:TOOLS,
+      onText:({text:t})=>{ if(tk!==token) return; if(!rb){ ty.remove(); rb=el(`<div class="row"><div class="bub" data-rcs="Text · written by the AI agent"></div></div>`); thread.append(rb);} rb.firstElementChild.textContent=lastPara(t); thread.append(rb); scrollThread(); }});
+    if(tk!==token) return;
+    const final=lastPara(reply);
+    if(rb){ rb.firstElementChild.textContent=final; thread.append(rb); scrollThread(); } else { ty.remove(); addRow(bub(final)); }
+    turns.push({role:'assistant',content:final});
+    logLine({k:'send',t:'Reply delivered in web chat'});
+    setAgent(false,'waiting for the shopper');
+  }catch(e){
+    ty.remove(); if(tk!==token) return; turns.pop();
+    const msg={not_granted:'AI access was declined, so live mode is off for this view.',rate_limited:'Too many messages at once. Try again in a minute.',session_expired:'Sign in to Claude again to keep chatting.',tools_unavailable:'This view can\'t run the agent\'s tools.',cancelled:''}[e?.code] ?? 'The agent couldn\'t reply. Try sending again.';
+    if(msg) logLine({k:'evt',t:msg}); setAgent(false,e?.code==='not_granted'?'unavailable':'error');
+    if(e?.code==='not_granted'){ $('#cbox').className='cbox ph'; $('#cbox').textContent='Live mode is off'; $('#sugg').hidden=true; }
+  }finally{ if(tk===token){ busy=false; const i=$('#liveIn'); if(i) $('#sendBtn').disabled=!i.value.trim(); } }
+}
+$('#composer').addEventListener('submit',e=>{e.preventDefault(); const i=$('#liveIn'); if(LIVE&&i) sendLive(i.value);});
+thread.addEventListener('click',e=>{
+  if(!LIVE||busy||!liveTools) return; const b=e.target.closest('[data-act]'); if(!b||b.disabled) return;
+  const act=b.dataset.act;
+  if(act==='checkout'){ const c=cartLines(); if(!c.length) return; busy=true; const tk=token, tot=total(S);
+    runWebview(tk,true,{title:'Checkout',sub:'Demo checkout. Nothing is charged and no payment details are collected.',rows:[...c.map(l=>[l.n,l.v,money(l.price)]),['Ground shipping','2 to 6 business days',tot>=175?'Free':'Flat rate']],submit:`Place demo order · ${money(tot)}`}).then(ok=>{ busy=false; if(!ok) return;
+      c.forEach(l=>l.st='paid'); S.title='Shopify · Order #GB-48501'; S.status='Paid'; S.valL='Order value'; if(S.pts!=null) S.pts+=tot; S.page.cart=false; renderBoard(c.map(l=>l.id));
+      addRow(CARDS.confirm('Order confirmed',`Order #GB-48501 · ${money(tot)} · ships within one business day.`));
+      sendLive(`[System event, not typed by the shopper: Shopify reports order #GB-48501 paid, ${money(tot)}. Thank them in one sentence.]`,{silent:true}); }); }
+  else if(b.dataset.say){ sendLive(b.dataset.say); }
+  else if(['code','map','review'].includes(act)){ logLine({k:'send',t:`Tapped "${b.textContent.trim()}" · opens a link, handled outside the chat`}); }
+});
+
+/* ===================== wiring ===================== */
+[['close',RUNS.close],['kit',RUNS.kit],['exchange',RUNS.exchange]].forEach(([k,r])=>{
+  const b=el(`<button class="tab${k==='live'?' live':''}" role="tab" type="button" data-k="${k}">${k==='live'?'<span class="dot"></span>':`<span class="n">${r.n}</span>`}${r.label}</button>`);
+  b.onclick=()=>select(k); $('#tabs').append(b);
+});
+$('#replay').onclick=()=>select(cur);
+$('#speed').onclick=()=>{SPEED=SPEED===1?2:SPEED===2?3:1; $('#speed').textContent=`Speed ${SPEED}×`;};
+$('#notesBtn').onclick=()=>{const on=!$('#screen').classList.contains('notes'); $('#screen').classList.toggle('notes',on); $('#legend').hidden=!on;
+  $('#notesBtn').setAttribute('aria-pressed',on); $('#notesBtn').textContent=on?'Hide build notes':'Show build notes';};
+$('#pause').onclick=()=>{paused=!paused; $('#pause').textContent=paused?'Resume':'Pause'; setAgent(!paused,paused?'paused':'running');};
+
+function fmt(n){return n.toLocaleString('en-US');}
+function calc(){const o=+$('#sOrd').value,a=+$('#sAov').value,l=+$('#sLift').value/100,r=+$('#sRet').value/100,x=+$('#sExc').value/100;
+  const lift=o*a*l, kept=o*r*x*a;
+  $('#oOrd').textContent=fmt(o); $('#oAov').textContent='$'+a; $('#oLift').textContent=Math.round(l*100)+'%'; $('#oRet').textContent=Math.round(r*100)+'%'; $('#oExc').textContent=Math.round(x*100)+'%';
+  $('#rLift').textContent='$'+fmt(Math.round(lift)); $('#rKept').textContent='$'+fmt(Math.round(kept)); $('#rYear').textContent='$'+fmt(Math.round((lift+kept)*12));}
+['#sOrd','#sAov','#sLift','#sRet','#sExc'].forEach(s=>$(s).addEventListener('input',calc)); calc();
+
+select('close');
+</script>
+
+</body>
+</html>
